@@ -1,6 +1,12 @@
 import { Message } from "@/app/types/chat";
-import { Box, Button, TextField, Typography, Paper } from "@mui/material";
-import Grid2 from "@mui/material/Grid2";
+import {
+  Box,
+  Button,
+  TextField,
+  Typography,
+  Paper,
+  Stack,
+} from "@mui/material";
 import { useState } from "react";
 
 function decodeBase64(str: string) {
@@ -39,6 +45,14 @@ const processCharacterData = (characterData: CharacterData) => {
   };
 
   return processedData;
+};
+
+const whatsappTheme = {
+  primary: "#128C7E",
+  secondary: "#075E54",
+  lightGreen: "#25D366",
+  background: "#ECE5DD",
+  chatBackground: "#ffffff",
 };
 
 export const CharacterSetting = ({
@@ -157,12 +171,40 @@ Scenario: ${processed.scenario}
   };
 
   return (
-    <Paper elevation={3} sx={{ p: 3, maxWidth: 800, mx: "auto", my: 2 }}>
-      <Typography variant="h5" gutterBottom>
-        Character Settings
-      </Typography>
+    <Paper
+      elevation={3}
+      sx={{
+        p: 3,
+        maxWidth: 800,
+        mx: "auto",
+        my: 2,
+        backgroundColor: whatsappTheme.background,
+        borderRadius: 2,
+      }}
+    >
+      <Box
+        sx={{
+          backgroundColor: whatsappTheme.primary,
+          p: 2,
+          mb: 2,
+          mx: -3,
+          mt: -3,
+          borderTopLeftRadius: 8,
+          borderTopRightRadius: 8,
+        }}
+      >
+        <Typography variant="h5" sx={{ color: "white" }}>
+          Character Settings
+        </Typography>
+      </Box>
 
-      <Box sx={{ mb: 3 }}>
+      <Box
+        sx={{
+          mb: 3,
+          display: "flex",
+          justifyContent: "center",
+        }}
+      >
         <input
           type="file"
           accept=".png"
@@ -174,85 +216,158 @@ Scenario: ${processed.scenario}
           id="character-upload"
         />
         <label htmlFor="character-upload">
-          <Button variant="contained" component="span" sx={{ mr: 2 }}>
+          <Button
+            variant="contained"
+            component="span"
+            sx={{
+              mr: 2,
+              backgroundColor: whatsappTheme.lightGreen,
+              "&:hover": {
+                backgroundColor: whatsappTheme.secondary,
+              },
+            }}
+          >
             Import Character Card
           </Button>
         </label>
       </Box>
 
-      <Grid2 container spacing={2} direction="row" wrap="wrap">
-        <Grid2>
-          <TextField
-            fullWidth
-            label="Name"
-            value={characterData.name}
-            onChange={handleInputChange("name")}
-            margin="normal"
-            required
-          />
-        </Grid2>
-        <Grid2>
-          <TextField
-            fullWidth
-            label="Description"
-            value={characterData.description}
-            onChange={handleInputChange("description")}
-            margin="normal"
-            required
-            multiline
-            rows={3}
-          />
-        </Grid2>
-        <Grid2>
-          <TextField
-            fullWidth
-            label="Personality"
-            value={characterData.personality}
-            onChange={handleInputChange("personality")}
-            margin="normal"
-            multiline
-            rows={2}
-          />
-        </Grid2>
-        <Grid2>
-          <TextField
-            fullWidth
-            label="Example Messages"
-            value={characterData.mes_example}
-            onChange={handleInputChange("mes_example")}
-            margin="normal"
-            multiline
-            rows={2}
-          />
-        </Grid2>
-        <Grid2>
-          <TextField
-            fullWidth
-            label="Scenario"
-            value={characterData.scenario}
-            onChange={handleInputChange("scenario")}
-            margin="normal"
-            multiline
-            rows={2}
-          />
-        </Grid2>
-        <Grid2>
-          <TextField
-            fullWidth
-            label="First Message"
-            value={characterData.first_mes}
-            onChange={handleInputChange("first_mes")}
-            margin="normal"
-          />
-        </Grid2>
-      </Grid2>
+      <Stack
+        spacing={2}
+        sx={{
+          backgroundColor: whatsappTheme.chatBackground,
+          p: 2,
+          borderRadius: 2,
+          boxShadow: 1,
+        }}
+      >
+        <TextField
+          label="Name"
+          value={characterData.name}
+          onChange={handleInputChange("name")}
+          required
+          sx={{
+            maxWidth: 400,
+            "& .MuiOutlinedInput-root": {
+              "&.Mui-focused fieldset": {
+                borderColor: whatsappTheme.primary,
+              },
+            },
+            "& .MuiInputLabel-root.Mui-focused": {
+              color: whatsappTheme.primary,
+            },
+          }}
+        />
+        <TextField
+          label="Description"
+          value={characterData.description}
+          onChange={handleInputChange("description")}
+          required
+          multiline
+          minRows={3}
+          maxRows={6}
+          sx={{
+            "& .MuiOutlinedInput-root": {
+              "&.Mui-focused fieldset": {
+                borderColor: whatsappTheme.primary,
+              },
+            },
+            "& .MuiInputLabel-root.Mui-focused": {
+              color: whatsappTheme.primary,
+            },
+          }}
+        />
+        <TextField
+          label="Personality"
+          value={characterData.personality}
+          onChange={handleInputChange("personality")}
+          multiline
+          minRows={2}
+          maxRows={4}
+          sx={{
+            "& .MuiOutlinedInput-root": {
+              "&.Mui-focused fieldset": {
+                borderColor: whatsappTheme.primary,
+              },
+            },
+            "& .MuiInputLabel-root.Mui-focused": {
+              color: whatsappTheme.primary,
+            },
+          }}
+        />
+        <TextField
+          label="Example Messages"
+          value={characterData.mes_example}
+          onChange={handleInputChange("mes_example")}
+          multiline
+          minRows={2}
+          maxRows={4}
+          sx={{
+            "& .MuiOutlinedInput-root": {
+              "&.Mui-focused fieldset": {
+                borderColor: whatsappTheme.primary,
+              },
+            },
+            "& .MuiInputLabel-root.Mui-focused": {
+              color: whatsappTheme.primary,
+            },
+          }}
+        />
+        <TextField
+          label="Scenario"
+          value={characterData.scenario}
+          onChange={handleInputChange("scenario")}
+          multiline
+          minRows={2}
+          maxRows={4}
+          sx={{
+            "& .MuiOutlinedInput-root": {
+              "&.Mui-focused fieldset": {
+                borderColor: whatsappTheme.primary,
+              },
+            },
+            "& .MuiInputLabel-root.Mui-focused": {
+              color: whatsappTheme.primary,
+            },
+          }}
+        />
+        <TextField
+          label="First Message"
+          value={characterData.first_mes}
+          onChange={handleInputChange("first_mes")}
+          multiline
+          minRows={1}
+          maxRows={3}
+          sx={{
+            "& .MuiOutlinedInput-root": {
+              "&.Mui-focused fieldset": {
+                borderColor: whatsappTheme.primary,
+              },
+            },
+            "& .MuiInputLabel-root.Mui-focused": {
+              color: whatsappTheme.primary,
+            },
+          }}
+        />
+      </Stack>
 
-      <Box sx={{ mt: 3, display: "flex", justifyContent: "flex-end" }}>
+      <Box
+        sx={{
+          mt: 3,
+          display: "flex",
+          justifyContent: "flex-end",
+        }}
+      >
         <Button
           variant="contained"
-          color="primary"
           onClick={handleSaveCharacter}
-          sx={{ minWidth: 120 }}
+          sx={{
+            minWidth: 120,
+            backgroundColor: whatsappTheme.lightGreen,
+            "&:hover": {
+              backgroundColor: whatsappTheme.secondary,
+            },
+          }}
         >
           Save Character
         </Button>
