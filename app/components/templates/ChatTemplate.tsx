@@ -6,25 +6,31 @@ import { ChatBody } from "../organisms/ChatBody";
 import { ChatForm } from "../organisms/ChatForm";
 
 interface ChatTemplateProps {
-  messages: Message[];
-  input: string;
-  setInput: (value: string) => void;
+  generateImage: () => void;
   handleSubmit: (e: React.FormEvent) => void;
-  systemPrompt?: string;
-  setSystemPrompt?: (value: string) => void;
+  input: string;
   isLoading: boolean;
+  messages: Message[];
+  setInput: (value: string) => void;
+  setSystemPrompt?: (value: string) => void;
+  systemPrompt?: string;
+  charaAppearance?: string;
+  setCharaAppearance?: (value: string) => void;
 }
 
 export const ChatTemplate = forwardRef<HTMLDivElement, ChatTemplateProps>(
   (
     {
-      messages,
-      input,
-      setInput,
+      generateImage,
       handleSubmit,
-      systemPrompt,
-      setSystemPrompt,
+      input,
       isLoading,
+      messages,
+      setInput,
+      setSystemPrompt,
+      systemPrompt,
+      charaAppearance,
+      setCharaAppearance,
     },
     ref
   ) => {
@@ -37,6 +43,8 @@ export const ChatTemplate = forwardRef<HTMLDivElement, ChatTemplateProps>(
         <ChatHeader
           systemPrompt={systemPrompt || ""}
           onSystemPromptChange={setSystemPrompt}
+          charaAppearance={charaAppearance || ""}
+          onCharaAppearanceChange={setCharaAppearance}
         />
         <ChatBody messages={messages} isLoading={isLoading} ref={ref} />
         <ChatForm
@@ -44,6 +52,7 @@ export const ChatTemplate = forwardRef<HTMLDivElement, ChatTemplateProps>(
           isLoading={isLoading}
           onInputChange={handleInputChange}
           onSubmit={handleSubmit}
+          onGenerateImage={generateImage}
         />
       </Box>
     );

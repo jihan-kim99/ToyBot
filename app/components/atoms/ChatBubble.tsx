@@ -1,4 +1,4 @@
-import { Paper, Typography } from "@mui/material";
+import { Paper, Typography, Box } from "@mui/material";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import "prismjs/themes/prism.css";
@@ -7,9 +7,15 @@ interface ChatBubbleProps {
   text: string;
   timestamp: Date;
   isUser: boolean;
+  imageUrl?: string;
 }
 
-export const ChatBubble = ({ text, timestamp, isUser }: ChatBubbleProps) => (
+export const ChatBubble = ({
+  text,
+  timestamp,
+  isUser,
+  imageUrl,
+}: ChatBubbleProps) => (
   <Paper
     sx={{
       maxWidth: "70%",
@@ -34,18 +40,31 @@ export const ChatBubble = ({ text, timestamp, isUser }: ChatBubbleProps) => (
       },
     }}
   >
-    <ReactMarkdown
-      remarkPlugins={[remarkGfm]}
-      components={{
-        p: ({ children }) => (
-          <Typography variant="body1" color="text.primary">
-            {children}
-          </Typography>
-        ),
-      }}
-    >
-      {text}
-    </ReactMarkdown>
+    {imageUrl ? (
+      <Box
+        component="img"
+        src={imageUrl}
+        alt="Generated image"
+        sx={{
+          width: "40%",
+          height: "auto",
+          borderRadius: 1,
+        }}
+      />
+    ) : (
+      <ReactMarkdown
+        remarkPlugins={[remarkGfm]}
+        components={{
+          p: ({ children }) => (
+            <Typography variant="body1" color="text.primary">
+              {children}
+            </Typography>
+          ),
+        }}
+      >
+        {text}
+      </ReactMarkdown>
+    )}
     <Typography
       variant="caption"
       sx={{

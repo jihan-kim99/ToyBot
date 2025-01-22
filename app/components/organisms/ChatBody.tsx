@@ -11,7 +11,6 @@ interface ChatBodyProps {
 export const ChatBody = forwardRef<HTMLDivElement, ChatBodyProps>(
   ({ messages, isLoading }, ref) => (
     <Box
-      ref={ref}
       sx={{
         flex: 1,
         overflow: "auto",
@@ -22,13 +21,18 @@ export const ChatBody = forwardRef<HTMLDivElement, ChatBodyProps>(
         gap: 2,
       }}
     >
-      {messages.map((message) => (
-        <ChatBubble
+      {messages.map((message, index) => (
+        <Box
           key={message.id}
-          text={message.text}
-          timestamp={message.timestamp}
-          isUser={message.sender === "user"}
-        />
+          ref={index === messages.length - 1 ? ref : undefined}
+        >
+          <ChatBubble
+            text={message.text}
+            timestamp={message.timestamp}
+            isUser={message.sender === "user"}
+            imageUrl={message?.imageUrl}
+          />
+        </Box>
       ))}
       {isLoading && (
         <Box sx={{ display: "flex", justifyContent: "center" }}>

@@ -16,17 +16,31 @@ import { useState } from "react";
 interface ChatHeaderProps {
   systemPrompt: string;
   onSystemPromptChange?: (value: string) => void;
+  charaAppearance: string;
+  onCharaAppearanceChange?: (value: string) => void;
 }
 
 export const ChatHeader = ({
   systemPrompt,
   onSystemPromptChange,
+  charaAppearance,
+  onCharaAppearanceChange,
 }: ChatHeaderProps) => {
   const [open, setOpen] = useState(false);
+  const [tempSystemPrompt, setTempSystemPrompt] = useState(systemPrompt);
+  const [tempCharaAppearance, setTempCharaAppearance] =
+    useState(charaAppearance);
 
   const handleSave = () => {
-    onSystemPromptChange?.(systemPrompt);
+    onSystemPromptChange?.(tempSystemPrompt);
+    onCharaAppearanceChange?.(tempCharaAppearance);
     setOpen(false);
+  };
+
+  const handleOpen = () => {
+    setTempSystemPrompt(systemPrompt);
+    setTempCharaAppearance(charaAppearance);
+    setOpen(true);
   };
 
   return (
@@ -36,7 +50,7 @@ export const ChatHeader = ({
           <Typography variant="h6">ChatBot</Typography>
           <IconButton
             color="inherit"
-            onClick={() => setOpen(true)}
+            onClick={handleOpen}
             aria-label="settings"
           >
             <SettingsIcon />
@@ -45,17 +59,27 @@ export const ChatHeader = ({
       </AppBar>
 
       <Dialog open={open} onClose={() => setOpen(false)} fullWidth>
-        <DialogTitle>System Prompt</DialogTitle>
+        <DialogTitle>Settings</DialogTitle>
         <DialogContent>
           <TextField
             autoFocus
             margin="dense"
-            label="Enter system prompt"
+            label="System Prompt"
             fullWidth
             multiline
             rows={4}
-            value={systemPrompt}
-            onChange={(e) => onSystemPromptChange?.(e.target.value)}
+            value={tempSystemPrompt}
+            onChange={(e) => setTempSystemPrompt(e.target.value)}
+          />
+          <TextField
+            margin="dense"
+            label="Character Appearance"
+            fullWidth
+            multiline
+            rows={2}
+            value={tempCharaAppearance}
+            onChange={(e) => setTempCharaAppearance(e.target.value)}
+            sx={{ mt: 2 }}
           />
         </DialogContent>
         <DialogActions>

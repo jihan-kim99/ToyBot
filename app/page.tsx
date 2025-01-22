@@ -6,6 +6,7 @@ import { Message } from "./types/chat";
 export default function ChatInterface() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [systemPrompt, setSystemPrompt] = useState<string>("");
+  const [charaAppearance, setcharaAppearance] = useState<string>("");
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -16,6 +17,7 @@ export default function ChatInterface() {
 
   useEffect(() => {
     scrollToBottom();
+    console.log("scrolling to bottom");
   }, [messages]);
 
   const sendMessageToBot = async (
@@ -74,14 +76,41 @@ export default function ChatInterface() {
     setMessages((prev) => [...prev, botMessage]);
   };
 
+  const generateImage = async () => {
+    const response = await fetch("/api/generateImage", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ messages, systemPrompt, charaAppearance }),
+    });
+
+    const data = await response.json();
+    if (data.success) {
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: Date.now(),
+          text: `Image: prompt ${data.prompt}`,
+          sender: "bot",
+          timestamp: new Date(),
+          imageUrl: data.imageUrl,
+        },
+      ]);
+      return;
+    }
+    throw new Error(data.error);
+  };
+
   return (
     <ChatTemplate
       messages={messages}
       input={input}
       setInput={setInput}
       handleSubmit={handleSubmit}
+      generateImage={generateImage}
       systemPrompt={systemPrompt}
       setSystemPrompt={setSystemPrompt}
+      charaAppearance={charaAppearance}
+      setCharaAppearance={setcharaAppearance}
       isLoading={isLoading}
       ref={messagesEndRef}
     />
