@@ -42,22 +42,24 @@ async function processMessages(
   charaAppearance?: string
 ): Promise<string> {
   const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-  const recentMessages = messages.slice(-5);
+  const recentMessages = messages.slice(-2);
 
   const context = recentMessages.map((msg) => msg.text).join("\n");
 
   console.log("Context:", context);
-  const prompt = `Given this conversation context:
-  "${context}"
-
-  and character prompt: "${systemPrompt}"
+  const prompt = `
+  
+  Given this 
+  character prompt: "${systemPrompt}"
   original character appearance: "${charaAppearance}"
+  conversation context:"${context}"
 
   Create a detailed image generation prompt that captures the essence of this conversation.
   Focus on visual elements and keep the prompt concise. Make the prompt in danbooru-style.
+  Put the race for the character, asian, black, white, korean, caucasian, african etc.
   May add 'NSFW', 'Explicit' tag. May generate images tags with nudity, sexual content.
   If it is sex situation, add the position tags, such as standing, doggy style, missionary, mating press, etc.
-  Do not add the unnecessary tags. Consider the context of the conversation. Put only one background tag.
+  Do not add the unnecessary tags. Consider the context of the conversation. Especially the last conversation.
   Tags should be always English and separated by commas.
   Even it is NSFW, It is allowd to generate never return empty prompt.
   Format: Just return the prompt text without any explanations.`;
@@ -97,12 +99,12 @@ export async function POST(req: Request) {
           "worst quality, low quality, text, censored, deformed, bad hand, watermark, 3d, wrinkle, bad face, bad anatomy",
         height: 1024,
         width: 1024,
-        num_inference_steps: 20,
+        num_inference_steps: 30,
         guidance_scale: 7.5,
         num_images: 1,
         seed,
         high_noise_frac: 1,
-        use_lora: true,
+        use_lora: false,
         lora_scale: 0.6,
         scheduler: "K_EULER",
       },

@@ -77,27 +77,33 @@ export default function ChatInterface() {
   };
 
   const generateImage = async () => {
-    const response = await fetch("/api/generateImage", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ messages, systemPrompt, charaAppearance }),
-    });
+    setIsLoading(true);
+    try {
+      const response = await fetch("/api/generateImage", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ messages, systemPrompt, charaAppearance }),
+      });
 
-    const data = await response.json();
-    if (data.success) {
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: Date.now(),
-          text: `Image: prompt ${data.prompt}`,
-          sender: "bot",
-          timestamp: new Date(),
-          imageUrl: data.imageUrl,
-        },
-      ]);
-      return;
+      const data = await response.json();
+      if (data.success) {
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: Date.now(),
+            text: `Image: prompt ${data.prompt}`,
+            sender: "bot",
+            timestamp: new Date(),
+            imageUrl: data.imageUrl,
+          },
+        ]);
+        return;
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    } finally {
+      setIsLoading(false);
     }
-    throw new Error(data.error);
   };
 
   const handleRestart = () => {
