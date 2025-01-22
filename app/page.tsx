@@ -100,6 +100,10 @@ export default function ChatInterface() {
     throw new Error(data.error);
   };
 
+  const handleRestart = () => {
+    setMessages([]);
+  };
+
   return (
     <ChatTemplate
       messages={messages}
@@ -111,6 +115,7 @@ export default function ChatInterface() {
       setSystemPrompt={setSystemPrompt}
       charaAppearance={charaAppearance}
       setCharaAppearance={setcharaAppearance}
+      handleRestart={handleRestart}
       isLoading={isLoading}
       ref={messagesEndRef}
     />

@@ -16,6 +16,7 @@ interface ChatTemplateProps {
   systemPrompt?: string;
   charaAppearance?: string;
   setCharaAppearance?: (value: string) => void;
+  handleRestart: () => void;
 }
 
 export const ChatTemplate = forwardRef<HTMLDivElement, ChatTemplateProps>(
@@ -31,6 +32,7 @@ export const ChatTemplate = forwardRef<HTMLDivElement, ChatTemplateProps>(
       systemPrompt,
       charaAppearance,
       setCharaAppearance,
+      handleRestart,
     },
     ref
   ) => {
@@ -45,6 +47,7 @@ export const ChatTemplate = forwardRef<HTMLDivElement, ChatTemplateProps>(
           onSystemPromptChange={setSystemPrompt}
           charaAppearance={charaAppearance || ""}
           onCharaAppearanceChange={setCharaAppearance}
+          handleRestart={handleRestart}
         />
         <ChatBody messages={messages} isLoading={isLoading} ref={ref} />
         <ChatForm

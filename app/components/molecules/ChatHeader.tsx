@@ -9,8 +9,10 @@ import {
   DialogActions,
   Button,
   TextField,
+  Box,
 } from "@mui/material";
 import SettingsIcon from "@mui/icons-material/Settings";
+import CloseIcon from "@mui/icons-material/Close";
 import { useState } from "react";
 
 interface ChatHeaderProps {
@@ -18,6 +20,7 @@ interface ChatHeaderProps {
   onSystemPromptChange?: (value: string) => void;
   charaAppearance: string;
   onCharaAppearanceChange?: (value: string) => void;
+  handleRestart: () => void;
 }
 
 export const ChatHeader = ({
@@ -25,8 +28,10 @@ export const ChatHeader = ({
   onSystemPromptChange,
   charaAppearance,
   onCharaAppearanceChange,
+  handleRestart,
 }: ChatHeaderProps) => {
   const [open, setOpen] = useState(false);
+  const [restartDialogOpen, setRestartDialogOpen] = useState(false);
   const [tempSystemPrompt, setTempSystemPrompt] = useState(systemPrompt);
   const [tempCharaAppearance, setTempCharaAppearance] =
     useState(charaAppearance);
@@ -43,18 +48,32 @@ export const ChatHeader = ({
     setOpen(true);
   };
 
+  const handleRestartConfirm = () => {
+    handleRestart();
+    setRestartDialogOpen(false);
+  };
+
   return (
     <>
       <AppBar position="static" sx={{ bgcolor: "#075e54" }}>
         <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
           <Typography variant="h6">ChatBot</Typography>
-          <IconButton
-            color="inherit"
-            onClick={handleOpen}
-            aria-label="settings"
-          >
-            <SettingsIcon />
-          </IconButton>
+          <Box>
+            <IconButton
+              color="inherit"
+              onClick={() => setRestartDialogOpen(true)}
+              aria-label="restart"
+            >
+              <CloseIcon />
+            </IconButton>
+            <IconButton
+              color="inherit"
+              onClick={handleOpen}
+              aria-label="settings"
+            >
+              <SettingsIcon />
+            </IconButton>
+          </Box>
         </Toolbar>
       </AppBar>
 
@@ -86,6 +105,26 @@ export const ChatHeader = ({
           <Button onClick={() => setOpen(false)}>Cancel</Button>
           <Button onClick={handleSave} variant="contained">
             Save
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog
+        open={restartDialogOpen}
+        onClose={() => setRestartDialogOpen(false)}
+      >
+        <DialogTitle>Restart Chat</DialogTitle>
+        <DialogContent>
+          <Typography>Are you sure you want to restart the chat?</Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setRestartDialogOpen(false)}>Cancel</Button>
+          <Button
+            onClick={handleRestartConfirm}
+            color="error"
+            variant="contained"
+          >
+            Restart
           </Button>
         </DialogActions>
       </Dialog>
