@@ -2,6 +2,7 @@
 import { useState, useRef, useEffect } from "react";
 import { ChatTemplate } from "./components/templates/ChatTemplate";
 import { Message } from "./types/chat";
+import { CharacterSetting } from "./components/templates/CharacterSetting";
 
 export default function ChatInterface() {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -109,6 +110,15 @@ export default function ChatInterface() {
   const handleRestart = () => {
     setMessages([]);
   };
+
+  if (systemPrompt === "") {
+    return (
+      <CharacterSetting
+        setMessages={setMessages}
+        setSystemPrompt={setSystemPrompt}
+      />
+    );
+  }
 
   return (
     <ChatTemplate
