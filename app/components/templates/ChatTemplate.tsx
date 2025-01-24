@@ -6,6 +6,7 @@ import { ChatBody } from "../organisms/ChatBody";
 import { ChatForm } from "../organisms/ChatForm";
 
 interface ChatTemplateProps {
+  charaImage: string;
   generateImage: () => void;
   handleSubmit: (e: React.FormEvent) => void;
   input: string;
@@ -22,6 +23,7 @@ interface ChatTemplateProps {
 export const ChatTemplate = forwardRef<HTMLDivElement, ChatTemplateProps>(
   (
     {
+      charaImage,
       generateImage,
       handleSubmit,
       input,
@@ -43,6 +45,7 @@ export const ChatTemplate = forwardRef<HTMLDivElement, ChatTemplateProps>(
     return (
       <Box sx={{ height: "100vh", display: "flex", flexDirection: "column" }}>
         <ChatHeader
+          charaImage={charaImage}
           systemPrompt={systemPrompt || ""}
           onSystemPromptChange={setSystemPrompt}
           charaAppearance={charaAppearance || ""}

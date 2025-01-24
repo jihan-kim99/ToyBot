@@ -14,8 +14,10 @@ import {
 import SettingsIcon from "@mui/icons-material/Settings";
 import CloseIcon from "@mui/icons-material/Close";
 import { useState } from "react";
+import Avatar from "@mui/material/Avatar";
 
 interface ChatHeaderProps {
+  charaImage: string;
   systemPrompt: string;
   onSystemPromptChange?: (value: string) => void;
   charaAppearance: string;
@@ -24,6 +26,7 @@ interface ChatHeaderProps {
 }
 
 export const ChatHeader = ({
+  charaImage,
   systemPrompt,
   onSystemPromptChange,
   charaAppearance,
@@ -57,7 +60,28 @@ export const ChatHeader = ({
     <>
       <AppBar position="static" sx={{ bgcolor: "#075e54" }}>
         <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
-          <Typography variant="h6">ChatBot</Typography>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+            <Avatar
+              src={charaImage || undefined}
+              alt="Character"
+              sx={{
+                width: 40,
+                height: 40,
+                border: "2px solid rgba(255, 255, 255, 0.2)",
+              }}
+            />
+            <Box>
+              <Typography variant="subtitle1" sx={{ fontWeight: "bold" }}>
+                ChatBot
+              </Typography>
+              <Typography
+                variant="caption"
+                sx={{ color: "rgba(255, 255, 255, 0.7)" }}
+              >
+                Online
+              </Typography>
+            </Box>
+          </Box>
           <Box>
             <IconButton
               color="inherit"

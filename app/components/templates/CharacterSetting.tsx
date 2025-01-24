@@ -7,6 +7,7 @@ import {
   Paper,
   Stack,
 } from "@mui/material";
+import Image from "next/image";
 import { useState } from "react";
 
 function decodeBase64(str: string) {
@@ -16,7 +17,10 @@ function decodeBase64(str: string) {
 }
 
 interface CharacterSettingProps {
+  charaImage: string;
+  setCharaImage: (value: string) => void;
   setSystemPrompt: (value: string) => void;
+  setCharaAppearance: (value: string) => void;
   setMessages: (value: Message[]) => void;
 }
 
@@ -55,8 +59,91 @@ const whatsappTheme = {
   chatBackground: "#ffffff",
 };
 
+const ENDPOINT = "https://api.runpod.ai/v2/1uj9rvztdrkhhj/run";
+const STATUS_ENDPOINT = "https://api.runpod.ai/v2/1uj9rvztdrkhhj/status/";
+const API_KEY = process.env.NEXT_PUBLIC_RUNPOD_API_KEY;
+
+interface RunPodOutput {
+  image_url: string;
+  [key: string]: unknown;
+}
+
+interface RunPodStatus {
+  status: string;
+  output?: RunPodOutput;
+  error?: string;
+}
+
+const checkStatus = async (jobId: string): Promise<RunPodOutput | null> => {
+  while (true) {
+    const response = await fetch(`${STATUS_ENDPOINT}${jobId}`, {
+      headers: { Authorization: `Bearer ${API_KEY}` },
+    });
+    const status: RunPodStatus = await response.json();
+
+    if (status.status === "COMPLETED" && status.output) {
+      return status.output;
+    } else if (status.status === "FAILED") {
+      throw new Error(`Job failed: ${status.error}`);
+    }
+
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+  }
+};
+
+const generateImage = async (prompt: string) => {
+  try {
+    const seed = Math.floor(Math.random() * 65535);
+    const payload = {
+      input: {
+        prompt: `masterpiece, high quality, ${prompt}`,
+        negative_prompt:
+          "worst quality, low quality, text, censored, deformed, bad hand, watermark, 3d, wrinkle, bad face, bad anatomy",
+        height: 1024,
+        width: 1024,
+        num_inference_steps: 30,
+        guidance_scale: 7.5,
+        num_images: 1,
+        seed,
+        high_noise_frac: 1,
+        use_lora: false,
+        lora_scale: 0.6,
+        scheduler: "K_EULER",
+      },
+    };
+
+    const response = await fetch(ENDPOINT, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const result = await response.json();
+    const output = await checkStatus(result.id);
+
+    if (!output || !output.image_url) {
+      throw new Error("No image URL found in output");
+    }
+
+    return output.image_url;
+  } catch (error) {
+    console.error("Error generating image:", error);
+    return null;
+  }
+};
+
 export const CharacterSetting = ({
+  charaImage,
+  setCharaImage,
   setSystemPrompt,
+  setCharaAppearance,
   setMessages,
 }: CharacterSettingProps) => {
   const [characterData, setCharacterData] = useState<CharacterData>({
@@ -67,6 +154,8 @@ export const CharacterSetting = ({
     scenario: "",
     first_mes: "",
   });
+
+  const [charaImagePrompt, setCharaImagePrompt] = useState("");
 
   const handleInputChange =
     (field: keyof CharacterData) =>
@@ -86,6 +175,7 @@ Example message: ${processed.mes_example}
 Scenario: ${processed.scenario}
       `;
       setSystemPrompt(systemPrompt);
+      setCharaAppearance(charaImagePrompt);
       setMessages([
         {
           id: Date.now(),
@@ -170,6 +260,15 @@ Scenario: ${processed.scenario}
     }
   };
 
+  const handleGenerateImage = async () => {
+    if (!charaImagePrompt) return;
+
+    const imageUrl = await generateImage(charaImagePrompt);
+    if (imageUrl) {
+      setCharaImage(imageUrl);
+    }
+  };
+
   return (
     <Paper
       elevation={3}
@@ -241,6 +340,59 @@ Scenario: ${processed.scenario}
           boxShadow: 1,
         }}
       >
+        <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
+          <TextField
+            label="Image Prompt"
+            value={charaImagePrompt}
+            onChange={(e) => setCharaImagePrompt(e.target.value)}
+            sx={{
+              flex: 1,
+              "& .MuiOutlinedInput-root": {
+                "&.Mui-focused fieldset": {
+                  borderColor: whatsappTheme.primary,
+                },
+              },
+              "& .MuiInputLabel-root.Mui-focused": {
+                color: whatsappTheme.primary,
+              },
+            }}
+          />
+          <Button
+            variant="contained"
+            onClick={handleGenerateImage}
+            disabled={!charaImagePrompt}
+            sx={{
+              backgroundColor: whatsappTheme.lightGreen,
+              "&:hover": {
+                backgroundColor: whatsappTheme.secondary,
+              },
+            }}
+          >
+            Generate Image
+          </Button>
+        </Box>
+
+        {charaImage && (
+          <Box
+            sx={{
+              textAlign: "center",
+              mt: 2,
+              position: "relative",
+              height: "200px",
+            }}
+          >
+            <Image
+              src={charaImage}
+              alt="Character"
+              fill
+              style={{
+                objectFit: "contain",
+                borderRadius: "8px",
+              }}
+            />
+          </Box>
+        )}
+
         <TextField
           label="Name"
           value={characterData.name}

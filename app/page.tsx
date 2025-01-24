@@ -8,6 +8,7 @@ export default function ChatInterface() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [systemPrompt, setSystemPrompt] = useState<string>("");
   const [charaAppearance, setcharaAppearance] = useState<string>("");
+  const [charaImage, setCharaImage] = useState<string>("");
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -114,7 +115,10 @@ export default function ChatInterface() {
   if (systemPrompt === "") {
     return (
       <CharacterSetting
+        charaImage={charaImage}
+        setCharaImage={setCharaImage}
         setMessages={setMessages}
+        setCharaAppearance={setcharaAppearance}
         setSystemPrompt={setSystemPrompt}
       />
     );
@@ -122,6 +126,7 @@ export default function ChatInterface() {
 
   return (
     <ChatTemplate
+      charaImage={charaImage}
       messages={messages}
       input={input}
       setInput={setInput}
