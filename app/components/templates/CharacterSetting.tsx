@@ -168,18 +168,17 @@ export const CharacterSetting = ({
 
   const handleSaveCharacter = () => {
     try {
-      const processed = processCharacterData(characterData);
-      const systemPrompt = `Character: ${processed.name}
-Description: ${processed.description}
-Example message: ${processed.mes_example}
-Scenario: ${processed.scenario}
+      const systemPrompt = `Character: ${characterData.name}
+Description: ${characterData.description}
+Example message: ${characterData.mes_example}
+Scenario: ${characterData.scenario}
       `;
       setSystemPrompt(systemPrompt);
       setCharaAppearance(charaImagePrompt);
       setMessages([
         {
           id: Date.now(),
-          text: processed.first_mes,
+          text: characterData.first_mes || "Hello!",
           sender: "bot",
           timestamp: new Date(),
         },
@@ -233,24 +232,9 @@ Scenario: ${processed.scenario}
         try {
           const jsonStr = decodeBase64(base64Text);
           const rawCharacterData = JSON.parse(jsonStr);
-          setCharacterData(rawCharacterData); // Update form with imported data
           const characterData = processCharacterData(rawCharacterData);
+          setCharacterData(characterData);
           console.log("Processed character data:", characterData);
-
-          const systemPrompt = `Character: ${characterData.name}
-            Description: ${characterData.description}
-            Example message: ${characterData.mes_example}
-            Scenario: ${characterData.scenario}
-          `;
-          setSystemPrompt(systemPrompt);
-          setMessages([
-            {
-              id: Date.now(),
-              text: characterData.first_mes,
-              sender: "bot",
-              timestamp: new Date(),
-            },
-          ]);
         } catch (e) {
           console.error("Data processing error:", e);
         }

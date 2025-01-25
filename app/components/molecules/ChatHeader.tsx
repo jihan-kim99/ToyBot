@@ -56,6 +56,11 @@ export const ChatHeader = ({
     setRestartDialogOpen(false);
   };
 
+  const getCharacterName = () => {
+    const match = systemPrompt.match(/Character:\s*(.*?)(?:\n|$)/);
+    return match ? match[1].trim() : "ChatBot";
+  };
+
   return (
     <>
       <AppBar position="static" sx={{ bgcolor: "#075e54" }}>
@@ -72,7 +77,7 @@ export const ChatHeader = ({
             />
             <Box>
               <Typography variant="subtitle1" sx={{ fontWeight: "bold" }}>
-                ChatBot
+                {getCharacterName()}
               </Typography>
               <Typography
                 variant="caption"
