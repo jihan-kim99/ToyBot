@@ -1,4 +1,7 @@
+import { CharacterData } from "@/app/types/character";
 import { Message } from "@/app/types/chat";
+import decodeCharacterCard from "@/app/utils/decodeCharaCard";
+import { generateImage } from "@/app/utils/generateImage";
 import {
   Box,
   Button,
@@ -10,12 +13,6 @@ import {
 import Image from "next/image";
 import { useState } from "react";
 
-function decodeBase64(str: string) {
-  // Convert base64 to raw binary data held in a string
-  const binaryString = Buffer.from(str, "base64").toString("binary");
-  return binaryString;
-}
-
 interface CharacterSettingProps {
   charaImage: string;
   setCharaImage: (value: string) => void;
@@ -24,119 +21,12 @@ interface CharacterSettingProps {
   setMessages: (value: Message[]) => void;
 }
 
-interface CharacterData {
-  name?: string;
-  description?: string;
-  personality?: string;
-  mes_example?: string;
-  scenario?: string;
-  first_mes?: string;
-}
-
-const processCharacterData = (characterData: CharacterData) => {
-  // Required fields
-  if (!characterData.name || !characterData.description) {
-    throw new Error("Name and description are required");
-  }
-
-  // Optional fields with defaults
-  const processedData = {
-    name: characterData.name.trim(),
-    description: characterData.description.trim(),
-    mes_example: characterData.mes_example?.trim() || "",
-    scenario: characterData.scenario?.trim() || "No specific scenario",
-    first_mes: characterData.first_mes?.trim() || "Hello!",
-  };
-
-  return processedData;
-};
-
 const whatsappTheme = {
   primary: "#128C7E",
   secondary: "#075E54",
   lightGreen: "#25D366",
   background: "#ECE5DD",
   chatBackground: "#ffffff",
-};
-
-const ENDPOINT = "https://api.runpod.ai/v2/1uj9rvztdrkhhj/run";
-const STATUS_ENDPOINT = "https://api.runpod.ai/v2/1uj9rvztdrkhhj/status/";
-const API_KEY = process.env.NEXT_PUBLIC_RUNPOD_API_KEY;
-
-interface RunPodOutput {
-  image_url: string;
-  [key: string]: unknown;
-}
-
-interface RunPodStatus {
-  status: string;
-  output?: RunPodOutput;
-  error?: string;
-}
-
-const checkStatus = async (jobId: string): Promise<RunPodOutput | null> => {
-  while (true) {
-    const response = await fetch(`${STATUS_ENDPOINT}${jobId}`, {
-      headers: { Authorization: `Bearer ${API_KEY}` },
-    });
-    const status: RunPodStatus = await response.json();
-
-    if (status.status === "COMPLETED" && status.output) {
-      return status.output;
-    } else if (status.status === "FAILED") {
-      throw new Error(`Job failed: ${status.error}`);
-    }
-
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-  }
-};
-
-const generateImage = async (prompt: string) => {
-  try {
-    const seed = Math.floor(Math.random() * 65535);
-    const payload = {
-      input: {
-        prompt: `masterpiece, high quality, ${prompt}`,
-        negative_prompt:
-          "worst quality, low quality, text, censored, deformed, bad hand, watermark, 3d, wrinkle, bad face, bad anatomy",
-        height: 1024,
-        width: 1024,
-        num_inference_steps: 30,
-        guidance_scale: 7.5,
-        num_images: 1,
-        seed,
-        high_noise_frac: 1,
-        use_lora: false,
-        lora_scale: 0.6,
-        scheduler: "K_EULER",
-      },
-    };
-
-    const response = await fetch(ENDPOINT, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(payload),
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    const result = await response.json();
-    const output = await checkStatus(result.id);
-
-    if (!output || !output.image_url) {
-      throw new Error("No image URL found in output");
-    }
-
-    return output.image_url;
-  } catch (error) {
-    console.error("Error generating image:", error);
-    return null;
-  }
 };
 
 export const CharacterSetting = ({
@@ -188,62 +78,6 @@ Scenario: ${characterData.scenario}
     }
   };
 
-  const decodeCharacterCard = async (file: File) => {
-    try {
-      const arrayBuffer = await file.arrayBuffer();
-      const bytes = new Uint8Array(arrayBuffer);
-
-      // Find tEXtchara position
-      let start = -1;
-      for (let i = 0; i < bytes.length - 8; i++) {
-        if (
-          bytes[i] === 0x74 &&
-          bytes[i + 1] === 0x45 &&
-          bytes[i + 2] === 0x58 &&
-          bytes[i + 3] === 0x74 &&
-          bytes[i + 4] === 0x63 &&
-          bytes[i + 5] === 0x68 &&
-          bytes[i + 6] === 0x61 &&
-          bytes[i + 7] === 0x72 &&
-          bytes[i + 8] === 0x61
-        ) {
-          start = i + 9;
-          break;
-        }
-      }
-
-      let end = -1;
-      for (let i = start; i < bytes.length - 4; i++) {
-        if (
-          bytes[i] === 0x49 &&
-          bytes[i + 1] === 0x45 &&
-          bytes[i + 2] === 0x4e &&
-          bytes[i + 3] === 0x44
-        ) {
-          end = i;
-          break;
-        }
-      }
-
-      if (start > -1 && end > -1) {
-        const rawData = bytes.slice(start, end);
-        const base64Text = new TextDecoder().decode(rawData);
-
-        try {
-          const jsonStr = decodeBase64(base64Text);
-          const rawCharacterData = JSON.parse(jsonStr);
-          const characterData = processCharacterData(rawCharacterData);
-          setCharacterData(characterData);
-          console.log("Processed character data:", characterData);
-        } catch (e) {
-          console.error("Data processing error:", e);
-        }
-      }
-    } catch (error) {
-      console.error("Error:", error);
-    }
-  };
-
   const handleGenerateImage = async () => {
     if (!charaImagePrompt) return;
 
@@ -291,9 +125,13 @@ Scenario: ${characterData.scenario}
         <input
           type="file"
           accept=".png"
-          onChange={(e) => {
+          onChange={async (e) => {
             const file = e.target.files?.[0];
-            if (file) decodeCharacterCard(file);
+            if (file) {
+              const chara = await decodeCharacterCard(file);
+              if (!chara) return;
+              setCharacterData(chara);
+            }
           }}
           style={{ display: "none" }}
           id="character-upload"
