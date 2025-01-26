@@ -1,10 +1,13 @@
+import { Box, Button, Typography, Paper } from "@mui/material";
+
+import Image from "next/image";
+import { useImageViewer } from "react-image-viewer-hook";
+
 import { CharacterData } from "@/app/types/character";
 import { Message } from "@/app/types/chat";
 import decodeCharacterCard from "@/app/utils/decodeCharaCard";
 import { generateImage } from "@/app/utils/generateImage";
-import { Box, Button, Typography, Paper } from "@mui/material";
-import Image from "next/image";
-import { useState, useCallback, DragEvent } from "react";
+import { useState, useCallback, DragEvent, SetStateAction } from "react";
 import { CharacterForm } from "../molecules/CharacterForm";
 import { StyledTextField } from "../atoms/StyledTextField";
 import { whatsappTheme } from "@/app/theme/whatsapp";
@@ -12,7 +15,9 @@ import { whatsappTheme } from "@/app/theme/whatsapp";
 interface CharacterSettingProps {
   charaImage: string;
   setCharaImage: (value: string) => void;
-  setSystemPrompt: (value: string) => void;
+  systemPrompt: CharacterData;
+  charaAppearance: string;
+  setSystemPrompt: (value: SetStateAction<CharacterData>) => void;
   setCharaAppearance: (value: string) => void;
   setMessages: (value: Message[]) => void;
 }
@@ -20,20 +25,20 @@ interface CharacterSettingProps {
 export const CharacterSetting = ({
   charaImage,
   setCharaImage,
+  systemPrompt,
   setSystemPrompt,
+  charaAppearance,
   setCharaAppearance,
   setMessages,
 }: CharacterSettingProps) => {
-  const [characterData, setCharacterData] = useState<CharacterData>({
-    name: "",
-    description: "",
-    personality: "",
-    mes_example: "",
-    scenario: "",
-    first_mes: "",
-  });
-  const [charaImagePrompt, setCharaImagePrompt] = useState("");
+  const [charaImagePrompt, setCharaImagePrompt] = useState(charaAppearance);
   const [isDragging, setIsDragging] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
+
+  const [characterData, setCharacterData] =
+    useState<CharacterData>(systemPrompt);
+
+  const { getOnClick, ImageViewer } = useImageViewer();
 
   const handleInputChange =
     (field: keyof CharacterData) =>
@@ -42,27 +47,28 @@ export const CharacterSetting = ({
     };
 
   const handleSaveCharacter = () => {
-    const systemPrompt = `Character: ${characterData.name}
-Description: ${characterData.description}
-Example message: ${characterData.mes_example}
-Scenario: ${characterData.scenario}`;
-
-    setSystemPrompt(systemPrompt);
+    setSystemPrompt(characterData);
+    const firstMessage: Message = {
+      id: Date.now(),
+      text: characterData.first_mes || "Hello! How can I help you today?",
+      sender: "bot",
+      timestamp: new Date(),
+    };
+    setMessages([firstMessage]);
     setCharaAppearance(charaImagePrompt);
-    setMessages([
-      {
-        id: Date.now(),
-        text: characterData.first_mes || "Hello!",
-        sender: "bot",
-        timestamp: new Date(),
-      },
-    ]);
   };
 
   const handleGenerateImage = async () => {
     if (!charaImagePrompt) return;
-    const imageUrl = await generateImage(charaImagePrompt);
-    if (imageUrl) setCharaImage(imageUrl);
+    setIsGenerating(true);
+    try {
+      const imageUrl = await generateImage(charaImagePrompt);
+      if (imageUrl) setCharaImage(imageUrl);
+    } catch (error) {
+      console.error("Error:", error);
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   const handleDragOver = useCallback((e: DragEvent<HTMLDivElement>) => {
@@ -171,34 +177,52 @@ Scenario: ${characterData.scenario}`;
           label="Image Prompt"
           value={charaImagePrompt}
           onChange={(e) => setCharaImagePrompt(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") handleGenerateImage();
+          }}
           sx={{ flex: 1 }}
         />
         <Button
           variant="contained"
           onClick={handleGenerateImage}
-          disabled={!charaImagePrompt}
+          disabled={!charaImagePrompt || isGenerating}
           sx={{ backgroundColor: whatsappTheme.lightGreen }}
         >
           Generate Image
         </Button>
+        {
+          <Typography variant="caption" sx={{ alignSelf: "center" }}>
+            {isGenerating ? "Generating..." : ""}
+          </Typography>
+        }
       </Box>
 
       {charaImage && (
-        <Box
-          sx={{
-            textAlign: "center",
-            mb: 2,
-            position: "relative",
-            height: "200px",
-          }}
-        >
-          <Image
-            src={charaImage}
-            alt="Character"
-            fill
-            style={{ objectFit: "contain", borderRadius: "8px" }}
-          />
-        </Box>
+        <>
+          <Box
+            sx={{
+              textAlign: "center",
+              mb: 2,
+              position: "relative",
+              height: "200px",
+              cursor: "pointer",
+              overflow: "hidden",
+              borderRadius: "8px",
+            }}
+            onClick={getOnClick(charaImage)}
+          >
+            <Image
+              src={charaImage}
+              alt="Character"
+              fill
+              style={{
+                objectFit: "contain",
+                borderRadius: "8px",
+              }}
+            />
+          </Box>
+          <ImageViewer />
+        </>
       )}
 
       <CharacterForm

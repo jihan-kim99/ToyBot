@@ -42,15 +42,6 @@ export const CharacterForm = ({
       maxRows={6}
     />
     <StyledTextField
-      label="Personality"
-      value={characterData.personality}
-      onChange={onFieldChange("personality")}
-      required
-      multiline
-      minRows={3}
-      maxRows={6}
-    />
-    <StyledTextField
       label="Message Example"
       value={characterData.mes_example}
       onChange={onFieldChange("mes_example")}

@@ -1,40 +1,45 @@
 import { Box } from "@mui/material";
-import { forwardRef } from "react";
+import { Dispatch, forwardRef, SetStateAction } from "react";
 import { Message } from "../../types/chat";
 import { ChatHeader } from "../molecules/ChatHeader";
 import { ChatBody } from "../organisms/ChatBody";
 import { ChatForm } from "../organisms/ChatForm";
+import { CharacterData } from "@/app/types/character";
 
 interface ChatTemplateProps {
+  charaAppearance?: string;
   charaImage: string;
   generateImage: () => void;
+  handleRestart: () => void;
   handleSubmit: (e: React.FormEvent) => void;
   input: string;
   isLoading: boolean;
   messages: Message[];
-  setInput: (value: string) => void;
-  setSystemPrompt?: (value: string) => void;
-  systemPrompt?: string;
-  charaAppearance?: string;
   setCharaAppearance?: (value: string) => void;
-  handleRestart: () => void;
+  setCharaImage: (value: string) => void;
+  setInput: (value: string) => void;
+  setMessages: (value: Message[]) => void;
+  setSystemPrompt: Dispatch<SetStateAction<CharacterData>>;
+  systemPrompt: CharacterData;
 }
 
 export const ChatTemplate = forwardRef<HTMLDivElement, ChatTemplateProps>(
   (
     {
+      charaAppearance,
       charaImage,
       generateImage,
+      handleRestart,
       handleSubmit,
       input,
       isLoading,
       messages,
+      setCharaAppearance,
+      setCharaImage,
       setInput,
+      setMessages,
       setSystemPrompt,
       systemPrompt,
-      charaAppearance,
-      setCharaAppearance,
-      handleRestart,
     },
     ref
   ) => {
@@ -46,7 +51,9 @@ export const ChatTemplate = forwardRef<HTMLDivElement, ChatTemplateProps>(
       <Box sx={{ height: "100vh", display: "flex", flexDirection: "column" }}>
         <ChatHeader
           charaImage={charaImage}
-          systemPrompt={systemPrompt || ""}
+          setCharaImage={setCharaImage}
+          setMessages={setMessages}
+          systemPrompt={systemPrompt}
           onSystemPromptChange={setSystemPrompt}
           charaAppearance={charaAppearance || ""}
           onCharaAppearanceChange={setCharaAppearance}

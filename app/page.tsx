@@ -4,9 +4,18 @@ import { ChatTemplate } from "./components/templates/ChatTemplate";
 import { Message } from "./types/chat";
 import { CharacterSetting } from "./components/templates/CharacterSetting";
 
+import type { CharacterData } from "@/app/types/character";
+
 export default function ChatInterface() {
   const [messages, setMessages] = useState<Message[]>([]);
-  const [systemPrompt, setSystemPrompt] = useState<string>("");
+  const [systemPrompt, setSystemPrompt] = useState<CharacterData>({
+    name: "",
+    description: "",
+    personality: "",
+    mes_example: "",
+    scenario: "",
+    first_mes: "",
+  });
   const [charaAppearance, setcharaAppearance] = useState<string>("");
   const [charaImage, setCharaImage] = useState<string>("");
   const [input, setInput] = useState("");
@@ -112,13 +121,15 @@ export default function ChatInterface() {
     setMessages([]);
   };
 
-  if (systemPrompt === "") {
+  if (systemPrompt.name === "") {
     return (
       <CharacterSetting
         charaImage={charaImage}
         setCharaImage={setCharaImage}
         setMessages={setMessages}
+        charaAppearance={charaAppearance}
         setCharaAppearance={setcharaAppearance}
+        systemPrompt={systemPrompt}
         setSystemPrompt={setSystemPrompt}
       />
     );
@@ -126,19 +137,21 @@ export default function ChatInterface() {
 
   return (
     <ChatTemplate
-      charaImage={charaImage}
-      messages={messages}
-      input={input}
-      setInput={setInput}
-      handleSubmit={handleSubmit}
-      generateImage={generateImage}
-      systemPrompt={systemPrompt}
-      setSystemPrompt={setSystemPrompt}
       charaAppearance={charaAppearance}
-      setCharaAppearance={setcharaAppearance}
+      charaImage={charaImage}
+      generateImage={generateImage}
       handleRestart={handleRestart}
+      handleSubmit={handleSubmit}
+      input={input}
       isLoading={isLoading}
+      messages={messages}
       ref={messagesEndRef}
+      setCharaAppearance={setcharaAppearance}
+      setCharaImage={setCharaImage}
+      setInput={setInput}
+      setMessages={setMessages}
+      setSystemPrompt={setSystemPrompt}
+      systemPrompt={systemPrompt}
     />
   );
 }

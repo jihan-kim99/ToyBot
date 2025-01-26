@@ -8,57 +8,51 @@ import {
   DialogContent,
   DialogActions,
   Button,
-  TextField,
   Box,
 } from "@mui/material";
 import SettingsIcon from "@mui/icons-material/Settings";
 import CloseIcon from "@mui/icons-material/Close";
-import { useState } from "react";
+import { SetStateAction, useState } from "react";
 import Avatar from "@mui/material/Avatar";
+import { CharacterSetting } from "../templates/CharacterSetting";
+import { Message } from "@/app/types/chat";
+import { CharacterData } from "@/app/types/character";
 
 interface ChatHeaderProps {
   charaImage: string;
-  systemPrompt: string;
-  onSystemPromptChange?: (value: string) => void;
+  systemPrompt: CharacterData;
+  onSystemPromptChange?: (value: SetStateAction<CharacterData>) => void;
   charaAppearance: string;
   onCharaAppearanceChange?: (value: string) => void;
   handleRestart: () => void;
+  setCharaImage: (value: string) => void;
+  setMessages: (value: Message[]) => void;
 }
 
 export const ChatHeader = ({
   charaImage,
   systemPrompt,
   onSystemPromptChange,
-  charaAppearance,
   onCharaAppearanceChange,
   handleRestart,
+  setCharaImage,
+  charaAppearance,
+  setMessages,
 }: ChatHeaderProps) => {
   const [open, setOpen] = useState(false);
   const [restartDialogOpen, setRestartDialogOpen] = useState(false);
-  const [tempSystemPrompt, setTempSystemPrompt] = useState(systemPrompt);
-  const [tempCharaAppearance, setTempCharaAppearance] =
-    useState(charaAppearance);
-
-  const handleSave = () => {
-    onSystemPromptChange?.(tempSystemPrompt);
-    onCharaAppearanceChange?.(tempCharaAppearance);
-    setOpen(false);
-  };
 
   const handleOpen = () => {
-    setTempSystemPrompt(systemPrompt);
-    setTempCharaAppearance(charaAppearance);
     setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
   };
 
   const handleRestartConfirm = () => {
     handleRestart();
     setRestartDialogOpen(false);
-  };
-
-  const getCharacterName = () => {
-    const match = systemPrompt.match(/Character:\s*(.*?)(?:\n|$)/);
-    return match ? match[1].trim() : "ChatBot";
   };
 
   return (
@@ -77,7 +71,7 @@ export const ChatHeader = ({
             />
             <Box>
               <Typography variant="subtitle1" sx={{ fontWeight: "bold" }}>
-                {getCharacterName()}
+                {systemPrompt.name}
               </Typography>
               <Typography
                 variant="caption"
@@ -106,36 +100,16 @@ export const ChatHeader = ({
         </Toolbar>
       </AppBar>
 
-      <Dialog open={open} onClose={() => setOpen(false)} fullWidth>
-        <DialogTitle>Settings</DialogTitle>
-        <DialogContent>
-          <TextField
-            autoFocus
-            margin="dense"
-            label="System Prompt"
-            fullWidth
-            multiline
-            rows={4}
-            value={tempSystemPrompt}
-            onChange={(e) => setTempSystemPrompt(e.target.value)}
-          />
-          <TextField
-            margin="dense"
-            label="Character Appearance"
-            fullWidth
-            multiline
-            rows={2}
-            value={tempCharaAppearance}
-            onChange={(e) => setTempCharaAppearance(e.target.value)}
-            sx={{ mt: 2 }}
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setOpen(false)}>Cancel</Button>
-          <Button onClick={handleSave} variant="contained">
-            Save
-          </Button>
-        </DialogActions>
+      <Dialog open={open} onClose={handleClose} fullWidth maxWidth="md">
+        <CharacterSetting
+          charaImage={charaImage}
+          charaAppearance={charaAppearance}
+          setCharaImage={setCharaImage}
+          systemPrompt={systemPrompt}
+          setSystemPrompt={onSystemPromptChange || (() => {})}
+          setCharaAppearance={onCharaAppearanceChange || (() => {})}
+          setMessages={setMessages}
+        />
       </Dialog>
 
       <Dialog
