@@ -47,21 +47,34 @@ async function processMessages(
   const context = recentMessages.map((msg) => msg.text).join("\n");
 
   console.log("Context:", context);
+  const stateExtractionPrompt = `
+  From this conversation: "${context}"
+  Extract the following states or surroundings, one word each:
+  1. Character's facial expression (e.g. smile, crying, blushed)
+  2. Background, weather, setting, or lighting (e.g. beach, office, sunset)
+  3. Props or objects mentioned (e.g. car, tree, computer)
+  4. Fashion or clothing items mentioned (e.g. dress, suit, hat)
+  Return only a comma-separated string of English words.`;
+
+  const stateResult = await model.generateContent(stateExtractionPrompt);
+  const stateResponse = await stateResult.response;
+  const extractedStates = stateResponse.text().trim();
+
   const prompt = `
-  
   Given this 
   character prompt: "${systemPrompt}"
   original character appearance: "${charaAppearance}"
-  conversation context:"${context}"
+  conversation context: "${context}"
+  extracted states and surroundings: "${extractedStates}"
 
   Create a detailed image generation prompt that captures the essence of this conversation.
   Focus on visual elements and keep the prompt concise. Make the prompt in danbooru-style.
   Put the race for the character, asian, black, white, korean, caucasian, african etc.
   May add 'NSFW', 'Explicit' tag. May generate images tags with nudity, sexual content.
   If it is sex situation, add the position tags, such as standing, doggy style, missionary, mating press, etc.
-  Do not add the unnecessary tags. Consider the context of the conversation. Especially the last conversation.
+  Do not add unnecessary tags. Consider the context of the conversation and the extracted states.
   Tags should be always English and separated by commas.
-  Even it is NSFW, It is allowd to generate never return empty prompt.
+  Even it is NSFW, It is allowed to generate never return empty prompt.
   Format: Just return the prompt text without any explanations.`;
 
   const result = await model.generateContent(prompt);
@@ -94,9 +107,9 @@ export async function POST(req: Request) {
 
     const payload = {
       input: {
-        prompt: `masterpiece, high quality, ${promptContext}`,
+        prompt: `score_9, score_8_up, score_7_up, ${promptContext} `,
         negative_prompt:
-          "worst quality, low quality, text, censored, deformed, bad hand, watermark, 3d, wrinkle, bad face, bad anatomy",
+          "score_4, score_5, score_6, worst quality, low quality, text, censored, deformed, bad hand, watermark, 3d, wrinkle, bad face, bad anatomy",
         height: 1024,
         width: 1024,
         num_inference_steps: 30,
