@@ -1,7 +1,7 @@
-import { CharacterData } from "@/app/types/character";
+import { CharacterData } from "@/types/character";
 import { Stack } from "@mui/material";
 import { StyledTextField } from "../atoms/StyledTextField";
-import { whatsappTheme } from "@/app/theme/whatsapp";
+import { whatsappTheme } from "@/theme/whatsapp";
 
 interface CharacterFormProps {
   characterData: CharacterData;

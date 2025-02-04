@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { Message } from "@/app/types/chat";
+import { Message } from "@/types/chat";
+import { SchedulerType } from "@/utils/schedulerTypes";
 
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY || "");
 
@@ -17,6 +18,20 @@ interface RunPodStatus {
   status: string;
   output?: RunPodOutput;
   error?: string;
+}
+
+interface RunPodInput {
+  prompt: string;
+  negative_prompt: string;
+  height: number;
+  width: number;
+  num_inference_steps: number;
+  guidance_scale: number;
+  num_images: number;
+  seed: number;
+  use_lora: boolean;
+  lora_scale: number;
+  scheduler: SchedulerType;
 }
 
 async function checkStatus(jobId: string) {
@@ -116,11 +131,10 @@ export async function POST(req: Request) {
         guidance_scale: 7.5,
         num_images: 1,
         seed,
-        high_noise_frac: 1,
         use_lora: false,
         lora_scale: 0.6,
-        scheduler: "K_EULER",
-      },
+        scheduler: SchedulerType.EULER_A,
+      } satisfies RunPodInput,
     };
 
     const response = await fetch(ENDPOINT, {

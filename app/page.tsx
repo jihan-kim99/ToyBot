@@ -1,10 +1,10 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
-import { ChatTemplate } from "./components/templates/ChatTemplate";
-import { Message } from "./types/chat";
-import { CharacterSetting } from "./components/templates/CharacterSetting";
+import { ChatTemplate } from "../components/templates/ChatTemplate";
+import { CharacterSetting } from "../components/templates/CharacterSetting";
 
-import type { CharacterData } from "@/app/types/character";
+import { Message } from "@/types/chat";
+import type { CharacterData } from "@/types/character";
 
 export default function ChatInterface() {
   const [messages, setMessages] = useState<Message[]>([]);

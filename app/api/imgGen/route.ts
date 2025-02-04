@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { SchedulerType } from "@/utils/schedulerTypes";
 
 const API_KEY = process.env.RUNPOD_API_KEY;
 const ENDPOINT = "https://api.runpod.ai/v2/1uj9rvztdrkhhj/run";
@@ -13,6 +14,20 @@ interface RunPodStatus {
   status: string;
   output?: RunPodOutput;
   error?: string;
+}
+
+interface RunPodInput {
+  prompt: string;
+  negative_prompt: string;
+  height: number;
+  width: number;
+  num_inference_steps: number;
+  guidance_scale: number;
+  num_images: number;
+  seed: number;
+  use_lora: boolean;
+  lora_scale: number;
+  scheduler: SchedulerType;
 }
 
 async function checkStatus(jobId: string) {
@@ -34,25 +49,34 @@ async function checkStatus(jobId: string) {
 
 export async function POST(req: Request) {
   try {
-    const { prompt } = await req.json();
-    const seed = Math.floor(Math.random() * 65535);
+    const {
+      prompt,
+      negative_prompt = "worst quality, low quality, text, censored, deformed, bad hand, watermark, 3d, wrinkle, bad face, bad anatomy",
+      height = 1024,
+      width = 1024,
+      num_inference_steps = 30,
+      guidance_scale = 7.5,
+      num_images = 1,
+      seed = Math.floor(Math.random() * 65535),
+      use_lora = false,
+      lora_scale = 0.6,
+      scheduler = SchedulerType.DPMSolverSDEKarras,
+    } = await req.json();
 
     const payload = {
       input: {
         prompt: `masterpiece, high quality, ${prompt}`,
-        negative_prompt:
-          "worst quality, low quality, text, censored, deformed, bad hand, watermark, 3d, wrinkle, bad face, bad anatomy",
-        height: 1024,
-        width: 1024,
-        num_inference_steps: 30,
-        guidance_scale: 7.5,
-        num_images: 1,
+        negative_prompt,
+        height,
+        width,
+        num_inference_steps,
+        guidance_scale,
+        num_images,
         seed,
-        high_noise_frac: 1,
-        use_lora: false,
-        lora_scale: 0.6,
-        scheduler: "K_EULER",
-      },
+        use_lora,
+        lora_scale,
+        scheduler,
+      } satisfies RunPodInput,
     };
 
     const response = await fetch(ENDPOINT, {

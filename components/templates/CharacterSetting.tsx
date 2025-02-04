@@ -1,16 +1,15 @@
 import { Box, Button, Typography, Paper } from "@mui/material";
-
 import Image from "next/image";
 import { useImageViewer } from "react-image-viewer-hook";
 
-import { CharacterData } from "@/app/types/character";
-import { Message } from "@/app/types/chat";
-import decodeCharacterCard from "@/app/utils/decodeCharaCard";
-import { generateImage } from "@/app/utils/generateImage";
+import { CharacterData } from "@/types/character";
+import { Message } from "@/types/chat";
+import decodeCharacterCard from "@/utils/decodeCharaCard";
+import { generateImage } from "@/utils/generateImage";
 import { useState, useCallback, DragEvent, SetStateAction } from "react";
 import { CharacterForm } from "../molecules/CharacterForm";
 import { StyledTextField } from "../atoms/StyledTextField";
-import { whatsappTheme } from "@/app/theme/whatsapp";
+import { whatsappTheme } from "@/theme/whatsapp";
 
 interface CharacterSettingProps {
   charaImage: string;
@@ -62,7 +61,9 @@ export const CharacterSetting = ({
     if (!charaImagePrompt) return;
     setIsGenerating(true);
     try {
-      const imageUrl = await generateImage(charaImagePrompt);
+      const imageUrl = await generateImage({
+        prompt: charaImagePrompt,
+      });
       if (imageUrl) setCharaImage(imageUrl);
     } catch (error) {
       console.error("Error:", error);
@@ -230,7 +231,14 @@ export const CharacterSetting = ({
         onFieldChange={handleInputChange}
       />
 
-      <Box sx={{ mt: 3, display: "flex", justifyContent: "flex-end" }}>
+      <Box sx={{ mt: 3, display: "flex", justifyContent: "flex-end", gap: 2 }}>
+        <Button
+          variant="contained"
+          href="/generate"
+          sx={{ backgroundColor: whatsappTheme.lightGreen }}
+        >
+          Generate Image only
+        </Button>
         <Button
           variant="contained"
           onClick={handleSaveCharacter}

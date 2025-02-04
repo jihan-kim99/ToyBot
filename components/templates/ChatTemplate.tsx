@@ -4,7 +4,7 @@ import { Message } from "../../types/chat";
 import { ChatHeader } from "../molecules/ChatHeader";
 import { ChatBody } from "../organisms/ChatBody";
 import { ChatForm } from "../organisms/ChatForm";
-import { CharacterData } from "@/app/types/character";
+import { CharacterData } from "@/types/character";
 
 interface ChatTemplateProps {
   charaAppearance?: string;

@@ -12,11 +12,12 @@ import {
 } from "@mui/material";
 import SettingsIcon from "@mui/icons-material/Settings";
 import CloseIcon from "@mui/icons-material/Close";
+import AddIcon from "@mui/icons-material/Image";
 import { SetStateAction, useState } from "react";
 import Avatar from "@mui/material/Avatar";
 import { CharacterSetting } from "../templates/CharacterSetting";
-import { Message } from "@/app/types/chat";
-import { CharacterData } from "@/app/types/character";
+import { Message } from "@/types/chat";
+import { CharacterData } from "@/types/character";
 
 interface ChatHeaderProps {
   charaImage: string;
@@ -91,6 +92,13 @@ export const ChatHeader = ({
             </IconButton>
             <IconButton
               color="inherit"
+              href="/generate"
+              aria-label="character generator"
+            >
+              <AddIcon />
+            </IconButton>
+            <IconButton
+              color="inherit"
               onClick={handleOpen}
               aria-label="settings"
             >
@@ -98,39 +106,39 @@ export const ChatHeader = ({
             </IconButton>
           </Box>
         </Toolbar>
+
+        <Dialog open={open} onClose={handleClose} fullWidth maxWidth="md">
+          <CharacterSetting
+            charaImage={charaImage}
+            charaAppearance={charaAppearance}
+            setCharaImage={setCharaImage}
+            systemPrompt={systemPrompt}
+            setSystemPrompt={onSystemPromptChange || (() => {})}
+            setCharaAppearance={onCharaAppearanceChange || (() => {})}
+            setMessages={setMessages}
+          />
+        </Dialog>
+
+        <Dialog
+          open={restartDialogOpen}
+          onClose={() => setRestartDialogOpen(false)}
+        >
+          <DialogTitle>Restart Chat</DialogTitle>
+          <DialogContent>
+            <Typography>Are you sure you want to restart the chat?</Typography>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setRestartDialogOpen(false)}>Cancel</Button>
+            <Button
+              onClick={handleRestartConfirm}
+              color="error"
+              variant="contained"
+            >
+              Restart
+            </Button>
+          </DialogActions>
+        </Dialog>
       </AppBar>
-
-      <Dialog open={open} onClose={handleClose} fullWidth maxWidth="md">
-        <CharacterSetting
-          charaImage={charaImage}
-          charaAppearance={charaAppearance}
-          setCharaImage={setCharaImage}
-          systemPrompt={systemPrompt}
-          setSystemPrompt={onSystemPromptChange || (() => {})}
-          setCharaAppearance={onCharaAppearanceChange || (() => {})}
-          setMessages={setMessages}
-        />
-      </Dialog>
-
-      <Dialog
-        open={restartDialogOpen}
-        onClose={() => setRestartDialogOpen(false)}
-      >
-        <DialogTitle>Restart Chat</DialogTitle>
-        <DialogContent>
-          <Typography>Are you sure you want to restart the chat?</Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setRestartDialogOpen(false)}>Cancel</Button>
-          <Button
-            onClick={handleRestartConfirm}
-            color="error"
-            variant="contained"
-          >
-            Restart
-          </Button>
-        </DialogActions>
-      </Dialog>
     </>
   );
 };
