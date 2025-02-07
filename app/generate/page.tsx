@@ -19,7 +19,9 @@ import {
   Card,
   CardMedia,
   CardContent,
+  IconButton,
 } from "@mui/material";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === "dark" ? "#1A2027" : "#fff",
@@ -43,9 +45,35 @@ export default function GeneratePage() {
   const [loading, setLoading] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);
   const [promptHistory, setPromptHistory] = useState<
-    Array<{ prompt: string; negative_prompt: string; imageUrl: string }>
+    Array<{
+      prompt: string;
+      negative_prompt: string;
+      imageUrl: string;
+      id?: string;
+    }>
   >([]);
   const [isGalleryView, setIsGalleryView] = useState(false);
+
+  // Load history from localStorage on component mount
+  useEffect(() => {
+    const savedHistory = localStorage.getItem("promptHistory");
+    if (savedHistory) {
+      setPromptHistory(JSON.parse(savedHistory));
+    }
+  }, []);
+
+  // Update localStorage when history changes
+  const updateHistory = (
+    newHistory: Array<{
+      prompt: string;
+      negative_prompt: string;
+      imageUrl: string;
+      id?: string;
+    }>
+  ) => {
+    setPromptHistory(newHistory);
+    localStorage.setItem("promptHistory", JSON.stringify(newHistory));
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -53,15 +81,14 @@ export default function GeneratePage() {
     const url = await generateImage(params);
     setImageUrl(url);
     setLoading(false);
-    // Add current prompts and image to history
-    setPromptHistory((prev) => [
-      {
-        prompt: params.prompt,
-        negative_prompt: params.negative_prompt,
-        imageUrl: url,
-      },
-      ...prev, // Add new items at the start
-    ]);
+    // Add current prompts and image to history with unique id
+    const newItem = {
+      prompt: params.prompt,
+      negative_prompt: params.negative_prompt,
+      imageUrl: url,
+      id: Date.now().toString(), // Add unique id
+    };
+    updateHistory([newItem, ...promptHistory]);
   };
 
   const handleKeyPress = (e: KeyboardEvent) => {
@@ -169,6 +196,11 @@ export default function GeneratePage() {
         }, 0);
       }
     }
+  };
+
+  const handleDeleteHistoryItem = (id: string) => {
+    const newHistory = promptHistory.filter((item) => item.id !== id);
+    updateHistory(newHistory);
   };
 
   return (
@@ -374,16 +406,16 @@ export default function GeneratePage() {
             <>
               <Grid container spacing={1}>
                 {promptHistory.map((item, index) => (
-                  <Grid key={index} size={6}>
+                  <Grid key={item.id ?? index} size={6}>
                     <Card
                       sx={{
+                        position: "relative",
                         cursor: "pointer",
                         "&:hover": {
                           transform: "scale(1.02)",
                           transition: "transform 0.2s",
                         },
                       }}
-                      onClick={getOnClick(item.imageUrl)}
                     >
                       <CardMedia
                         component="img"
@@ -391,7 +423,26 @@ export default function GeneratePage() {
                         image={item.imageUrl}
                         alt={item.prompt}
                         sx={{ objectFit: "cover" }}
+                        onClick={getOnClick(item.imageUrl)}
                       />
+                      <IconButton
+                        size="small"
+                        sx={{
+                          position: "absolute",
+                          right: 4,
+                          top: 4,
+                          bgcolor: "rgba(255, 255, 255, 0.7)",
+                          "&:hover": {
+                            bgcolor: "rgba(255, 255, 255, 0.9)",
+                          },
+                        }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDeleteHistoryItem(item.id!);
+                        }}
+                      >
+                        <DeleteIcon fontSize="small" />
+                      </IconButton>
                     </Card>
                   </Grid>
                 ))}
@@ -402,9 +453,8 @@ export default function GeneratePage() {
             <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
               {promptHistory.map((item, index) => (
                 <Card
-                  key={index}
-                  sx={{ cursor: "pointer" }}
-                  onClick={() => handleHistorySelect(item)}
+                  key={item.id ?? index}
+                  sx={{ cursor: "pointer", position: "relative" }}
                 >
                   <CardMedia
                     component="img"
@@ -412,7 +462,26 @@ export default function GeneratePage() {
                     image={item.imageUrl}
                     alt={item.prompt}
                     sx={{ objectFit: "cover" }}
+                    onClick={() => handleHistorySelect(item)}
                   />
+                  <IconButton
+                    size="small"
+                    sx={{
+                      position: "absolute",
+                      right: 8,
+                      top: 8,
+                      bgcolor: "rgba(255, 255, 255, 0.7)",
+                      "&:hover": {
+                        bgcolor: "rgba(255, 255, 255, 0.9)",
+                      },
+                    }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDeleteHistoryItem(item.id!);
+                    }}
+                  >
+                    <DeleteIcon fontSize="small" />
+                  </IconButton>
                   <CardContent>
                     <Typography
                       variant="subtitle2"
