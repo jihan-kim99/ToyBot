@@ -2,6 +2,7 @@
 import { useState, useRef, useEffect } from "react";
 import { ChatTemplate } from "../components/templates/ChatTemplate";
 import { CharacterSetting } from "../components/templates/CharacterSetting";
+import type { GenerateImageResponse } from "@/types/api";
 
 import { Message } from "@/types/chat";
 import type { CharacterData } from "@/types/character";
@@ -90,25 +91,47 @@ export default function ChatInterface() {
   const generateImage = async () => {
     setIsLoading(true);
     try {
+      // Initial request to start image generation
       const response = await fetch("/api/generateImage", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ messages, systemPrompt, charaAppearance }),
       });
 
-      const data = await response.json();
-      if (data.success) {
-        setMessages((prev) => [
-          ...prev,
-          {
-            id: Date.now(),
-            text: `Image: prompt ${data.prompt}`,
-            sender: "bot",
-            timestamp: new Date(),
-            imageUrl: data.imageUrl,
-          },
-        ]);
-        return;
+      const data: GenerateImageResponse = await response.json();
+      if (!data.success || !data.jobId)
+        throw new Error(data.error || "Failed to start image generation");
+
+      const jobId = data.jobId;
+      const imageTags = data.imageTags;
+
+      // Start polling
+      while (true) {
+        const statusResponse = await fetch("/api/generateImage", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ jobId }),
+        });
+
+        const statusData: GenerateImageResponse = await statusResponse.json();
+
+        if (statusData.status === "COMPLETED" && statusData.imageUrl) {
+          setMessages((prev) => [
+            ...prev,
+            {
+              id: Date.now(),
+              text: `Image: prompt ${imageTags}`,
+              sender: "bot",
+              timestamp: new Date(),
+              imageUrl: statusData.imageUrl,
+            },
+          ]);
+          break;
+        } else if (statusData.status === "FAILED") {
+          throw new Error(statusData.error || "Image generation failed");
+        }
+
+        await new Promise((resolve) => setTimeout(resolve, 1000));
       }
     } catch (error) {
       console.error("Error:", error);

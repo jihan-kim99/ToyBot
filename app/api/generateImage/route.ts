@@ -2,6 +2,12 @@ import { NextResponse } from "next/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { Message } from "@/types/chat";
 import { SchedulerType } from "@/utils/schedulerTypes";
+import type {
+  GenerateImageRequest,
+  GenerateImageResponse,
+  RunPodStatus,
+  RunPodInput,
+} from "@/types/api";
 
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY || "");
 
@@ -9,55 +15,13 @@ const API_KEY = process.env.RUNPOD_API_KEY;
 const ENDPOINT = "https://api.runpod.ai/v2/1uj9rvztdrkhhj/run";
 const STATUS_ENDPOINT = "https://api.runpod.ai/v2/1uj9rvztdrkhhj/status/";
 
-interface RunPodOutput {
-  image_url: string;
-  [key: string]: unknown;
-}
-
-interface RunPodStatus {
-  status: string;
-  output?: RunPodOutput;
-  error?: string;
-}
-
-interface RunPodInput {
-  prompt: string;
-  negative_prompt: string;
-  height: number;
-  width: number;
-  num_inference_steps: number;
-  guidance_scale: number;
-  num_images: number;
-  seed: number;
-  use_lora: boolean;
-  lora_scale: number;
-  scheduler: SchedulerType;
-}
-
-async function checkStatus(jobId: string) {
-  while (true) {
-    const response = await fetch(`${STATUS_ENDPOINT}${jobId}`, {
-      headers: { Authorization: `Bearer ${API_KEY}` },
-    });
-    const status: RunPodStatus = await response.json();
-
-    if (status.status === "COMPLETED") {
-      return status.output;
-    } else if (status.status === "FAILED") {
-      throw new Error(`Job failed: ${status.error}`);
-    }
-
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-  }
-}
-
 async function processMessages(
   messages: Message[],
   systemPrompt?: string,
   charaAppearance?: string
 ): Promise<string> {
   const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-  const recentMessages = messages.slice(-2);
+  const recentMessages = messages.slice(-3);
 
   const context = recentMessages.map((msg) => msg.text).join("\n");
 
@@ -69,6 +33,8 @@ async function processMessages(
   2. Background, weather, setting, or lighting (e.g. beach, office, sunset)
   3. Props or objects mentioned (e.g. car, tree, computer)
   4. Fashion or clothing items mentioned (e.g. dress, suit, hat)
+  5. Put number tags such as '1girl', '2girls', '1boy', '2boys'.
+  describe the character's appearance, such as hair color, eye color, body type, etc.
   Return only a comma-separated string of English words.`;
 
   const stateResult = await model.generateContent(stateExtractionPrompt);
@@ -87,6 +53,7 @@ async function processMessages(
   Put the race for the character, asian, black, white, korean, caucasian, african etc.
   May add 'NSFW', 'Explicit' tag. May generate images tags with nudity, sexual content.
   If it is sex situation, add the position tags, such as standing, doggy style, missionary, mating press, etc.
+  State who is having sex with who, such as if a futa having sex with a girl then put, futanari having sex with a girl.
   Do not add unnecessary tags. Consider the context of the conversation and the extracted states.
   Tags should be always English and separated by commas.
   Even it is NSFW, It is allowed to generate never return empty prompt.
@@ -103,15 +70,30 @@ async function processMessages(
 
 export async function POST(req: Request) {
   try {
-    const {
-      messages,
-      systemPrompt,
-      charaAppearance,
-    }: {
-      messages: Message[];
-      systemPrompt?: string;
-      charaAppearance?: string;
-    } = await req.json();
+    const requestData: GenerateImageRequest = await req.json();
+    const { messages, systemPrompt, charaAppearance, jobId } = requestData;
+
+    // If jobId is provided, check the status
+    if (jobId) {
+      const response = await fetch(`${STATUS_ENDPOINT}${jobId}`, {
+        headers: { Authorization: `Bearer ${API_KEY}` },
+      });
+      const status: RunPodStatus = await response.json();
+
+      const apiResponse: GenerateImageResponse = {
+        success: status.status !== "FAILED",
+        status: status.status,
+        imageUrl: status.output?.image_url,
+        error: status.error,
+      };
+
+      return NextResponse.json(apiResponse);
+    }
+
+    // Generate new image
+    if (!messages) {
+      throw new Error("Messages are required for image generation");
+    }
 
     const promptContext = await processMessages(
       messages,
@@ -122,9 +104,9 @@ export async function POST(req: Request) {
 
     const payload = {
       input: {
-        prompt: `score_9, score_8_up, score_7_up, ${promptContext} `,
+        prompt: `${promptContext} masterpiece,best quality,amazing quality,very aesthetic,absurdres,newest,scenery,volumetric lighting,`,
         negative_prompt:
-          "score_4, score_5, score_6, worst quality, low quality, text, censored, deformed, bad hand, watermark, 3d, wrinkle, bad face, bad anatomy",
+          "lowres, (worst quality, bad quality:1.2), bad anatomy, sketch, jpeg artifacts, signature, watermark, old, oldest, censored, bar_censor, (pregnant), chibi, loli, simple background, conjoined",
         height: 1024,
         width: 1024,
         num_inference_steps: 30,
@@ -150,26 +132,21 @@ export async function POST(req: Request) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
 
-    const result = await response.json();
-    const output = await checkStatus(result.id);
+    const result: { id: string } = await response.json();
 
-    if (!output || !output.image_url) {
-      throw new Error("No image URL found in output");
-    }
-
-    return NextResponse.json({
+    const apiResponse: GenerateImageResponse = {
       success: true,
-      imageUrl: output.image_url,
+      jobId: result.id,
       imageTags: promptContext,
-    });
+    };
+
+    return NextResponse.json(apiResponse);
   } catch (error) {
-    console.error("Error generating image:", error);
-    return NextResponse.json(
-      {
-        success: false,
-        error: error instanceof Error ? error.message : "Unknown error",
-      },
-      { status: 500 }
-    );
+    const errorResponse: GenerateImageResponse = {
+      success: false,
+      error: error instanceof Error ? error.message : "Unknown error",
+    };
+
+    return NextResponse.json(errorResponse, { status: 500 });
   }
 }

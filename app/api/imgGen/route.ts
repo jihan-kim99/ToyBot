@@ -5,16 +5,16 @@ const API_KEY = process.env.RUNPOD_API_KEY;
 const ENDPOINT = "https://api.runpod.ai/v2/1uj9rvztdrkhhj/run";
 const STATUS_ENDPOINT = "https://api.runpod.ai/v2/1uj9rvztdrkhhj/status/";
 
-interface RunPodOutput {
-  image_url: string;
-  [key: string]: unknown;
-}
+// interface RunPodOutput {
+//   image_url: string;
+//   [key: string]: unknown;
+// }
 
-interface RunPodStatus {
-  status: string;
-  output?: RunPodOutput;
-  error?: string;
-}
+// interface RunPodStatus {
+//   status: string;
+//   output?: RunPodOutput;
+//   error?: string;
+// }
 
 interface RunPodInput {
   prompt: string;
@@ -30,25 +30,27 @@ interface RunPodInput {
   scheduler: SchedulerType;
 }
 
-async function checkStatus(jobId: string) {
-  while (true) {
-    const response = await fetch(`${STATUS_ENDPOINT}${jobId}`, {
-      headers: { Authorization: `Bearer ${API_KEY}` },
-    });
-    const status: RunPodStatus = await response.json();
-
-    if (status.status === "COMPLETED") {
-      return status.output;
-    } else if (status.status === "FAILED") {
-      throw new Error(`Job failed: ${status.error}`);
-    }
-
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-  }
-}
-
 export async function POST(req: Request) {
   try {
+    const { id, ...params } = await req.json();
+
+    // If id is provided, check status
+    if (id) {
+      const response = await fetch(`${STATUS_ENDPOINT}${id}`, {
+        headers: { Authorization: `Bearer ${API_KEY}` },
+      });
+      const status = await response.json();
+
+      return NextResponse.json({
+        success: true,
+        status: status.status,
+        imageUrl:
+          status.status === "COMPLETED" ? status.output?.image_url : null,
+        error: status.error,
+      });
+    }
+
+    // Otherwise, start new generation
     const {
       prompt,
       negative_prompt = "worst quality, low quality, text, censored, deformed, bad hand, watermark, 3d, wrinkle, bad face, bad anatomy",
@@ -61,7 +63,7 @@ export async function POST(req: Request) {
       use_lora = false,
       lora_scale = 0.6,
       scheduler = SchedulerType.DPMSolverSDEKarras,
-    } = await req.json();
+    } = params;
 
     const payload = {
       input: {
@@ -93,18 +95,12 @@ export async function POST(req: Request) {
     }
 
     const result = await response.json();
-    const output = await checkStatus(result.id);
-
-    if (!output || !output.image_url) {
-      throw new Error("No image URL found in output");
-    }
-
     return NextResponse.json({
       success: true,
-      imageUrl: output.image_url,
+      id: result.id,
     });
   } catch (error) {
-    console.error("Error generating image:", error);
+    console.error("Error:", error);
     return NextResponse.json(
       {
         success: false,

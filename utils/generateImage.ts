@@ -14,6 +14,7 @@ interface GenerationParams {
 
 export const generateImage = async (params: GenerationParams) => {
   try {
+    // Initial generation request
     const result = await fetch("/api/imgGen", {
       method: "POST",
       headers: {
@@ -32,10 +33,33 @@ export const generateImage = async (params: GenerationParams) => {
     });
 
     const data = await result.json();
-    if (!data.success || !data.imageUrl) {
-      throw new Error(data.error || "Failed to generate image");
+    if (!data.success || !data.id) {
+      throw new Error(data.error || "Failed to start generation");
     }
-    return data.imageUrl;
+
+    // Poll for results
+    while (true) {
+      const statusResult = await fetch("/api/imgGen", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ id: data.id }),
+      });
+
+      const statusData = await statusResult.json();
+
+      if (statusData.status === "COMPLETED" && statusData.imageUrl) {
+        return statusData.imageUrl;
+      }
+
+      if (statusData.status === "FAILED") {
+        throw new Error(statusData.error || "Generation failed");
+      }
+
+      // Wait before next poll
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+    }
   } catch (error) {
     console.error("Error generating image:", error);
     return null;
