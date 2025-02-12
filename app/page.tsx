@@ -96,7 +96,11 @@ export default function ChatInterface() {
       const response = await fetch("/api/generateImage", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ shrunkMessages, systemPrompt, charaAppearance }),
+        body: JSON.stringify({
+          messages: shrunkMessages,
+          systemPrompt,
+          charaAppearance,
+        }),
       });
 
       const data: GenerateImageResponse = await response.json();
