@@ -50,7 +50,6 @@ async function processMessages(
 
   Create a detailed image generation prompt that captures the essence of this conversation.
   Focus on visual elements and keep the prompt concise. Make the prompt in danbooru-style.
-  Put the race for the character, asian, black, white, korean, caucasian, african etc.
   May add 'NSFW', 'Explicit' tag. May generate images tags with nudity, sexual content.
   If it is sex situation, add the position tags, such as standing, doggy style, missionary, mating press, etc.
   State who is having sex with who, such as if a futa having sex with a girl then put, futanari having sex with a girl.
