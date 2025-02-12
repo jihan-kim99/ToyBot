@@ -21,9 +21,8 @@ async function processMessages(
   charaAppearance?: string
 ): Promise<string> {
   const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-  const recentMessages = messages.slice(-3);
 
-  const context = recentMessages.map((msg) => msg.text).join("\n");
+  const context = messages.map((msg) => msg.text).join("\n");
 
   console.log("Context:", context);
   const stateExtractionPrompt = `

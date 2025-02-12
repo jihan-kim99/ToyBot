@@ -90,12 +90,13 @@ export default function ChatInterface() {
 
   const generateImage = async () => {
     setIsLoading(true);
+    const shrunkMessages = messages.slice(-5);
     try {
       // Initial request to start image generation
       const response = await fetch("/api/generateImage", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages, systemPrompt, charaAppearance }),
+        body: JSON.stringify({ shrunkMessages, systemPrompt, charaAppearance }),
       });
 
       const data: GenerateImageResponse = await response.json();
