@@ -186,11 +186,27 @@ export const CharacterSetting = ({
           mt: -3,
           borderTopLeftRadius: 8,
           borderTopRightRadius: 8,
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
         }}
       >
         <Typography variant="h5" sx={{ color: "white" }}>
           Character Settings
         </Typography>
+        <Button
+          href="https://jannyai.com"
+          target="_blank"
+          rel="noopener noreferrer"
+          sx={{
+            color: "white",
+            "&:hover": {
+              color: whatsappTheme.lightGreen,
+            },
+          }}
+        >
+          Visit JannyAI
+        </Button>
       </Box>
 
       <Box
