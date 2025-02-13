@@ -1,15 +1,37 @@
-import { Box, Button, Typography, Paper } from "@mui/material";
+import {
+  Box,
+  Button,
+  Typography,
+  Paper,
+  IconButton,
+  Collapse,
+} from "@mui/material";
 import Image from "next/image";
 import { useImageViewer } from "react-image-viewer-hook";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import ExpandLessIcon from "@mui/icons-material/ExpandLess";
+import {
+  useState,
+  useCallback,
+  DragEvent,
+  SetStateAction,
+  useEffect,
+} from "react";
 
 import { CharacterData } from "@/types/character";
 import { Message } from "@/types/chat";
 import decodeCharacterCard from "@/utils/decodeCharaCard";
 import { generateImage } from "@/utils/generateImage";
-import { useState, useCallback, DragEvent, SetStateAction } from "react";
+import {
+  SavedCharacter,
+  getSavedCharacters,
+  saveCharacterToStorage,
+  deleteCharacter,
+} from "@/utils/localStorageUtils";
 import { CharacterForm } from "../molecules/CharacterForm";
 import { StyledTextField } from "../atoms/StyledTextField";
 import { whatsappTheme } from "@/theme/whatsapp";
+import { CardCarousel } from "../molecules/CardCarousel";
 
 interface CharacterSettingProps {
   charaImage: string;
@@ -39,13 +61,34 @@ export const CharacterSetting = ({
 
   const { getOnClick, ImageViewer } = useImageViewer();
 
+  const [savedCharacters, setSavedCharacters] = useState<SavedCharacter[]>([]);
+  const [isCarouselOpen, setIsCarouselOpen] = useState(false);
+
+  useEffect(() => {
+    setSavedCharacters(getSavedCharacters());
+  }, []);
+
+  const handleLoadCharacter = (savedChar: SavedCharacter) => {
+    setCharacterData(savedChar.data);
+    if (savedChar.imageUrl) {
+      setCharaImage(savedChar.imageUrl);
+    }
+  };
+
+  const handleDeleteCharacter = (id: string) => {
+    const updatedCharacters = deleteCharacter(id);
+    if (updatedCharacters) {
+      setSavedCharacters(updatedCharacters);
+    }
+  };
+
   const handleInputChange =
     (field: keyof CharacterData) =>
     (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
       setCharacterData((prev) => ({ ...prev, [field]: event.target.value }));
     };
 
-  const handleSaveCharacter = () => {
+  const handleSaveCharacter = async () => {
     setSystemPrompt(characterData);
     const firstMessage: Message = {
       id: Date.now(),
@@ -55,6 +98,14 @@ export const CharacterSetting = ({
     };
     setMessages([firstMessage]);
     setCharaAppearance(charaImagePrompt);
+
+    const updatedCharacters = await saveCharacterToStorage(
+      characterData,
+      charaImage
+    );
+    if (updatedCharacters) {
+      setSavedCharacters(updatedCharacters);
+    }
   };
 
   const handleGenerateImage = async () => {
@@ -82,16 +133,22 @@ export const CharacterSetting = ({
     setIsDragging(false);
   }, []);
 
-  const handleDrop = useCallback(async (e: DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    setIsDragging(false);
+  const handleDrop = useCallback(
+    async (e: DragEvent<HTMLDivElement>) => {
+      e.preventDefault();
+      setIsDragging(false);
 
-    const file = e.dataTransfer.files[0];
-    if (!file || !file.name.endsWith(".png")) return;
+      const file = e.dataTransfer.files[0];
+      if (!file || !file.name.endsWith(".png")) return;
 
-    const chara = await decodeCharacterCard(file);
-    if (chara) setCharacterData(chara);
-  }, []);
+      const result = await decodeCharacterCard(file);
+      if (result) {
+        setCharacterData(result.characterData);
+        setCharaImage(result.imageUrl);
+      }
+    },
+    [setCharacterData, setCharaImage]
+  );
 
   return (
     <Paper
@@ -151,26 +208,52 @@ export const CharacterSetting = ({
           onChange={async (e) => {
             const file = e.target.files?.[0];
             if (!file) return;
-            const chara = await decodeCharacterCard(file);
-            if (chara) setCharacterData(chara);
+            const result = await decodeCharacterCard(file);
+            if (result) {
+              setCharacterData(result.characterData);
+              setCharaImage(result.imageUrl);
+            }
           }}
           style={{ display: "none" }}
           id="character-upload"
         />
-        <label htmlFor="character-upload">
-          <Button
-            variant="contained"
-            component="span"
-            sx={{
-              backgroundColor: whatsappTheme.lightGreen,
-              position: "relative",
-              zIndex: 1,
-            }}
-          >
-            Import Character Card
-          </Button>
-        </label>
+        <Box sx={{ mb: 3, display: "flex", gap: 2, justifyContent: "center" }}>
+          <label htmlFor="character-upload">
+            <Button
+              variant="contained"
+              component="span"
+              sx={{
+                backgroundColor: whatsappTheme.lightGreen,
+                position: "relative",
+                zIndex: 1,
+              }}
+            >
+              Import Character Card
+            </Button>
+          </label>
+        </Box>
       </Box>
+
+      {savedCharacters.length > 0 && (
+        <Box sx={{ mb: 2 }}>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+            <Typography variant="subtitle1">Saved Characters</Typography>
+            <IconButton
+              onClick={() => setIsCarouselOpen(!isCarouselOpen)}
+              sx={{ color: whatsappTheme.lightGreen }}
+            >
+              {isCarouselOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+            </IconButton>
+          </Box>
+          <Collapse in={isCarouselOpen}>
+            <CardCarousel
+              characters={savedCharacters}
+              onSelect={handleLoadCharacter}
+              onDelete={handleDeleteCharacter}
+            />
+          </Collapse>
+        </Box>
+      )}
 
       {/* Image generation section */}
       <Box sx={{ display: "flex", gap: 2, mb: 2 }}>
@@ -230,7 +313,6 @@ export const CharacterSetting = ({
         characterData={characterData}
         onFieldChange={handleInputChange}
       />
-
       <Box sx={{ mt: 3, display: "flex", justifyContent: "flex-end", gap: 2 }}>
         <Button
           variant="contained"

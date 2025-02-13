@@ -12,8 +12,8 @@ import type {
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY || "");
 
 const API_KEY = process.env.RUNPOD_API_KEY;
-const ENDPOINT = "https://api.runpod.ai/v2/1uj9rvztdrkhhj/run";
-const STATUS_ENDPOINT = "https://api.runpod.ai/v2/1uj9rvztdrkhhj/status/";
+const ENDPOINT = `${process.env.RUNPOD_API_ENDPOINT}/run`;
+const STATUS_ENDPOINT = `${process.env.RUNPOD_API_ENDPOINT}/status/`;
 
 async function processMessages(
   messages: Message[],
@@ -24,7 +24,6 @@ async function processMessages(
 
   const context = messages.map((msg) => msg.text).join("\n");
 
-  console.log("Context:", context);
   const stateExtractionPrompt = `
   From this conversation: "${context}"
   Extract the following states or surroundings, one word each:
@@ -60,8 +59,6 @@ async function processMessages(
   const result = await model.generateContent(prompt);
   const response = await result.response;
   const processedPrompt = response.text().trim();
-
-  console.log("Processed prompt:", processedPrompt);
 
   return processedPrompt;
 }

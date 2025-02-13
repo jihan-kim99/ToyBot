@@ -29,6 +29,9 @@ const decodeCharacterCard = async (file: File) => {
     const arrayBuffer = await file.arrayBuffer();
     const bytes = new Uint8Array(arrayBuffer);
 
+    // Create base64 image URL from the PNG file
+    const imageUrl = `data:image/png;base64,${Buffer.from(arrayBuffer).toString('base64')}`;
+
     // Find tEXtchara position
     let start = -1;
     for (let i = 0; i < bytes.length - 8; i++) {
@@ -69,8 +72,10 @@ const decodeCharacterCard = async (file: File) => {
         const jsonStr = decodeBase64(base64Text);
         const rawCharacterData = JSON.parse(jsonStr);
         const characterData = processCharacterData(rawCharacterData);
-        // setCharacterData(characterData);
-        return characterData;
+        return {
+          characterData,
+          imageUrl
+        };
       } catch (e) {
         console.error("Data processing error:", e);
       }

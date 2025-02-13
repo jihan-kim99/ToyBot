@@ -29,7 +29,6 @@ export default function ChatInterface() {
 
   useEffect(() => {
     scrollToBottom();
-    console.log("scrolling to bottom");
   }, [messages]);
 
   const sendMessageToBot = async (
@@ -121,16 +120,23 @@ export default function ChatInterface() {
         const statusData: GenerateImageResponse = await statusResponse.json();
 
         if (statusData.status === "COMPLETED" && statusData.imageUrl) {
-          setMessages((prev) => [
-            ...prev,
-            {
-              id: Date.now(),
-              text: `Image: prompt ${imageTags}`,
-              sender: "bot",
-              timestamp: new Date(),
-              imageUrl: statusData.imageUrl,
-            },
-          ]);
+          // Check if the image URL already exists in messages
+          const imageExists = messages.some(
+            (msg) => msg.imageUrl === statusData.imageUrl
+          );
+
+          if (!imageExists) {
+            setMessages((prev) => [
+              ...prev,
+              {
+                id: Date.now(),
+                text: `Image: prompt ${imageTags}`,
+                sender: "bot",
+                timestamp: new Date(),
+                imageUrl: statusData.imageUrl,
+              },
+            ]);
+          }
           break;
         } else if (statusData.status === "FAILED") {
           throw new Error(statusData.error || "Image generation failed");

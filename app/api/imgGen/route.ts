@@ -2,8 +2,8 @@ import { NextResponse } from "next/server";
 import { SchedulerType } from "@/utils/schedulerTypes";
 
 const API_KEY = process.env.RUNPOD_API_KEY;
-const ENDPOINT = "https://api.runpod.ai/v2/1uj9rvztdrkhhj/run";
-const STATUS_ENDPOINT = "https://api.runpod.ai/v2/1uj9rvztdrkhhj/status/";
+const ENDPOINT = `${process.env.RUNPOD_API_ENDPOINT}/run`;
+const STATUS_ENDPOINT = `${process.env.RUNPOD_API_ENDPOINT}/status/`;
 
 // interface RunPodOutput {
 //   image_url: string;

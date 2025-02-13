@@ -95,8 +95,6 @@ export async function POST(request: Request) {
       });
     }
 
-    console.log("History:", JSON.stringify(formattedHistory, null, 2));
-
     const chat = model.startChat({
       history: formattedHistory,
       generationConfig: {

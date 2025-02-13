@@ -75,20 +75,41 @@ export default function GeneratePage() {
     localStorage.setItem("promptHistory", JSON.stringify(newHistory));
   };
 
+  const processImageForStorage = async (imageUrl: string) => {
+    try {
+      const response = await fetch("/api/processImage", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ imageUrl }),
+      });
+      const data = await response.json();
+      return data.processedImage;
+    } catch (error) {
+      console.error("Error processing image:", error);
+      return imageUrl; // fallback to original image if processing fails
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     const url = await generateImage(params);
     setImageUrl(url);
-    setLoading(false);
-    // Add current prompts and image to history with unique id
+
+    // Process image before saving to history
+    const processedUrl = await processImageForStorage(url);
+
+    // Add current prompts and processed image to history with unique id
     const newItem = {
       prompt: params.prompt,
       negative_prompt: params.negative_prompt,
-      imageUrl: url,
-      id: Date.now().toString(), // Add unique id
+      imageUrl: processedUrl,
+      id: Date.now().toString(),
     };
     updateHistory([newItem, ...promptHistory]);
+    setLoading(false);
   };
 
   const handleKeyPress = (e: KeyboardEvent) => {

@@ -18,6 +18,7 @@ import Avatar from "@mui/material/Avatar";
 import { CharacterSetting } from "../templates/CharacterSetting";
 import { Message } from "@/types/chat";
 import { CharacterData } from "@/types/character";
+import { useImageViewer } from "react-image-viewer-hook";
 
 interface ChatHeaderProps {
   charaImage: string;
@@ -42,6 +43,7 @@ export const ChatHeader = ({
 }: ChatHeaderProps) => {
   const [open, setOpen] = useState(false);
   const [restartDialogOpen, setRestartDialogOpen] = useState(false);
+  const { getOnClick, ImageViewer } = useImageViewer();
 
   const handleOpen = () => {
     setOpen(true);
@@ -64,10 +66,12 @@ export const ChatHeader = ({
             <Avatar
               src={charaImage || undefined}
               alt="Character"
+              onClick={charaImage ? getOnClick(charaImage) : undefined}
               sx={{
                 width: 40,
                 height: 40,
                 border: "2px solid rgba(255, 255, 255, 0.2)",
+                cursor: charaImage ? "pointer" : "default",
               }}
             />
             <Box>
@@ -139,6 +143,7 @@ export const ChatHeader = ({
           </DialogActions>
         </Dialog>
       </AppBar>
+      <ImageViewer />
     </>
   );
 };
