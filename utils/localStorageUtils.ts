@@ -12,33 +12,55 @@ export interface SavedCharacter {
 
 const compressImage = async (imageUrl: string): Promise<string> => {
   try {
-    const response = await fetch('/api/processImage', {
-      method: 'POST',
+    const response = await fetch("/api/processImage", {
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({ imageUrl }),
     });
 
     if (!response.ok) {
-      throw new Error('Image processing failed');
+      throw new Error("Image processing failed");
     }
 
     const data = await response.json();
     return data.processedImage;
   } catch (error) {
-    console.error('Error compressing image:', error);
+    console.error("Error compressing image:", error);
     return imageUrl; // Return original image if compression fails
   }
 };
 
+export const isCharacterEqual = (
+  char1: CharacterData,
+  char2: CharacterData
+): boolean => {
+  return JSON.stringify(char1) === JSON.stringify(char2);
+};
+
 export const saveCharacterToStorage = async (
   character: CharacterData,
-  imageUrl?: string
+  imageUrl?: string,
+  skipDuplicateCheck: boolean = false
 ) => {
   try {
     const savedCharacters = getSavedCharacters();
-    const compressedImage = imageUrl ? await compressImage(imageUrl) : undefined;
+
+    // Check for duplicates if not explicitly skipped
+    if (!skipDuplicateCheck) {
+      const existingChar = savedCharacters.find(
+        (saved) =>
+          isCharacterEqual(saved.data, character) && saved.imageUrl === imageUrl
+      );
+      if (existingChar) {
+        return savedCharacters; // Return existing list without saving
+      }
+    }
+
+    const compressedImage = imageUrl
+      ? await compressImage(imageUrl)
+      : undefined;
 
     const newCharacter: SavedCharacter = {
       id: Date.now().toString(),
@@ -49,7 +71,7 @@ export const saveCharacterToStorage = async (
     };
 
     const updatedCharacters = [...savedCharacters, newCharacter];
-    
+
     // Try to save with compressed image
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedCharacters));

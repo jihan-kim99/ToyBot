@@ -27,6 +27,7 @@ import {
   getSavedCharacters,
   saveCharacterToStorage,
   deleteCharacter,
+  isCharacterEqual,
 } from "@/utils/localStorageUtils";
 import { CharacterForm } from "../molecules/CharacterForm";
 import { StyledTextField } from "../atoms/StyledTextField";
@@ -58,6 +59,8 @@ export const CharacterSetting = ({
 
   const [characterData, setCharacterData] =
     useState<CharacterData>(systemPrompt);
+  const [originalCharacter, setOriginalCharacter] =
+    useState<SavedCharacter | null>(null);
 
   const { getOnClick, ImageViewer } = useImageViewer();
 
@@ -73,6 +76,7 @@ export const CharacterSetting = ({
     if (savedChar.imageUrl) {
       setCharaImage(savedChar.imageUrl);
     }
+    setOriginalCharacter(savedChar);
   };
 
   const handleDeleteCharacter = (id: string) => {
@@ -99,12 +103,24 @@ export const CharacterSetting = ({
     setMessages([firstMessage]);
     setCharaAppearance(charaImagePrompt);
 
+    // Check if we're trying to save an unchanged loaded character
+    if (
+      originalCharacter &&
+      isCharacterEqual(characterData, originalCharacter.data) &&
+      charaImage === originalCharacter.imageUrl
+    ) {
+      return; // Skip saving if nothing changed
+    }
+
     const updatedCharacters = await saveCharacterToStorage(
       characterData,
       charaImage
     );
     if (updatedCharacters) {
       setSavedCharacters(updatedCharacters);
+      // Update original character after successful save
+      const savedChar = updatedCharacters[updatedCharacters.length - 1];
+      setOriginalCharacter(savedChar);
     }
   };
 
