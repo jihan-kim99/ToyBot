@@ -33,6 +33,9 @@ import { CharacterForm } from "../molecules/CharacterForm";
 import { StyledTextField } from "../atoms/StyledTextField";
 import { whatsappTheme } from "@/theme/whatsapp";
 import { CardCarousel } from "../molecules/CardCarousel";
+import { ChatHistory, getCharacterChatHistories } from "@/utils/indexedDB";
+import { ChatHistorySlider } from "../molecules/ChatHistorySlider";
+import HistoryIcon from "@mui/icons-material/History";
 
 interface CharacterSettingProps {
   charaImage: string;
@@ -66,10 +69,20 @@ export const CharacterSetting = ({
 
   const [savedCharacters, setSavedCharacters] = useState<SavedCharacter[]>([]);
   const [isCarouselOpen, setIsCarouselOpen] = useState(false);
+  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
+  const [chatHistories, setChatHistories] = useState<ChatHistory[]>([]);
 
   useEffect(() => {
     setSavedCharacters(getSavedCharacters());
   }, []);
+
+  useEffect(() => {
+    if (characterData.name) {
+      getCharacterChatHistories(characterData.name)
+        .then((histories) => setChatHistories(histories))
+        .catch(console.error);
+    }
+  }, [characterData.name]);
 
   const handleLoadCharacter = (savedChar: SavedCharacter) => {
     setCharacterData(savedChar.data);
@@ -194,20 +207,38 @@ export const CharacterSetting = ({
         <Typography variant="h5" sx={{ color: "white" }}>
           Character Settings
         </Typography>
-        <Button
-          href="https://jannyai.com"
-          target="_blank"
-          rel="noopener noreferrer"
-          sx={{
-            color: "white",
-            "&:hover": {
-              color: whatsappTheme.lightGreen,
-            },
-          }}
-        >
-          Visit JannyAI
-        </Button>
+        <Box sx={{ display: "flex", gap: 2 }}>
+          <IconButton
+            onClick={() => setIsHistoryOpen(true)}
+            sx={{ color: "white" }}
+          >
+            <HistoryIcon />
+          </IconButton>
+          <Button
+            href="https://jannyai.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            sx={{
+              color: "white",
+              "&:hover": {
+                color: whatsappTheme.lightGreen,
+              },
+            }}
+          >
+            Visit JannyAI
+          </Button>
+        </Box>
       </Box>
+
+      <ChatHistorySlider
+        open={isHistoryOpen}
+        onClose={() => setIsHistoryOpen(false)}
+        chatHistories={chatHistories}
+        onSelectHistory={(messages) => {
+          setMessages(messages);
+          setSystemPrompt(characterData);
+        }}
+      />
 
       <Box
         sx={{

@@ -5,6 +5,7 @@ import { ChatHeader } from "../molecules/ChatHeader";
 import { ChatBody } from "../organisms/ChatBody";
 import { ChatForm } from "../organisms/ChatForm";
 import { CharacterData } from "@/types/character";
+import { ChatHistory } from "@/utils/indexedDB";
 
 interface ChatTemplateProps {
   charaAppearance?: string;
@@ -21,6 +22,7 @@ interface ChatTemplateProps {
   setMessages: (value: Message[]) => void;
   setSystemPrompt: Dispatch<SetStateAction<CharacterData>>;
   systemPrompt: CharacterData;
+  chatHistories: ChatHistory[];
 }
 
 export const ChatTemplate = forwardRef<HTMLDivElement, ChatTemplateProps>(

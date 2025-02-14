@@ -1,11 +1,35 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
+import debounce from "lodash/debounce";
 import { ChatTemplate } from "../components/templates/ChatTemplate";
 import { CharacterSetting } from "../components/templates/CharacterSetting";
 import type { GenerateImageResponse } from "@/types/api";
+import {
+  initDB,
+  saveChatHistory,
+  getCharacterChatHistories,
+  ChatHistory,
+} from "@/utils/indexedDB";
 
 import { Message } from "@/types/chat";
 import type { CharacterData } from "@/types/character";
+
+// Create debounced function outside component
+const createDebouncedSave = () =>
+  debounce(
+    (chatHistory: {
+      id: string;
+      characterId: string;
+      characterName: string;
+      messages: Message[];
+      lastUpdated: Date;
+    }) => {
+      saveChatHistory(chatHistory).catch((error) => {
+        console.error("Failed to save chat history:", error);
+      });
+    },
+    1000
+  );
 
 export default function ChatInterface() {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -21,6 +45,8 @@ export default function ChatInterface() {
   const [charaImage, setCharaImage] = useState<string>("");
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [chatId, setChatId] = useState<string>("");
+  const [chatHistories, setChatHistories] = useState<ChatHistory[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -30,6 +56,60 @@ export default function ChatInterface() {
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  // Initialize DB with error handling
+  useEffect(() => {
+    initDB().catch((error) => {
+      console.error("Failed to initialize database:", error);
+      // Optionally show an error message to the user
+    });
+  }, []);
+
+  useEffect(() => {
+    if (systemPrompt.name && !chatId) {
+      const newChatId = `${systemPrompt.name}-${Date.now()}`;
+      setChatId(newChatId);
+    }
+  }, [systemPrompt.name, chatId]);
+
+  // Add this new effect to load chat histories when character is selected
+  useEffect(() => {
+    if (systemPrompt.name) {
+      getCharacterChatHistories(systemPrompt.name)
+        .then((histories) => {
+          setChatHistories(
+            histories.sort(
+              (a, b) =>
+                new Date(b.lastUpdated).getTime() -
+                new Date(a.lastUpdated).getTime()
+            )
+          );
+        })
+        .catch((error) => {
+          console.error("Failed to load chat histories:", error);
+        });
+    }
+  }, [systemPrompt.name]);
+
+  // Memoize the debounced function
+  const debouncedSave = useRef(createDebouncedSave());
+
+  // Update the save effect with proper cleanup
+  useEffect(() => {
+    if (chatId && messages.length > 0) {
+      debouncedSave.current({
+        id: chatId,
+        characterId: systemPrompt.name || "",
+        characterName: systemPrompt.name || "", // Add this line
+        messages,
+        lastUpdated: new Date(),
+      });
+    }
+
+    return () => {
+      debouncedSave.current.cancel();
+    };
+  }, [messages, chatId, systemPrompt.name]);
 
   const sendMessageToBot = async (
     text: string,
@@ -153,6 +233,8 @@ export default function ChatInterface() {
 
   const handleRestart = () => {
     setMessages([]);
+    const newChatId = `${systemPrompt.name}-${Date.now()}`;
+    setChatId(newChatId);
   };
 
   if (systemPrompt.name === "") {
@@ -171,6 +253,7 @@ export default function ChatInterface() {
 
   return (
     <ChatTemplate
+      chatHistories={chatHistories} // Add this prop
       charaAppearance={charaAppearance}
       charaImage={charaImage}
       generateImage={generateImage}
