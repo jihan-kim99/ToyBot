@@ -108,8 +108,6 @@ export async function POST(req: Request) {
         guidance_scale: 7.5,
         num_images: 1,
         seed,
-        use_lora: false,
-        lora_scale: 0.6,
         scheduler: SchedulerType.EULER_A,
       } satisfies RunPodInput,
     };

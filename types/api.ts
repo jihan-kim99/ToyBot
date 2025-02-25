@@ -44,7 +44,5 @@ export interface RunPodInput {
   guidance_scale: number;
   num_images: number;
   seed: number;
-  use_lora: boolean;
-  lora_scale: number;
   scheduler: string;
 }

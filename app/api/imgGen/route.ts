@@ -1,34 +1,10 @@
 import { NextResponse } from "next/server";
 import { SchedulerType } from "@/utils/schedulerTypes";
+import { RunPodInput } from "@/types/api";
 
 const API_KEY = process.env.RUNPOD_API_KEY;
 const ENDPOINT = `${process.env.RUNPOD_API_ENDPOINT}/run`;
 const STATUS_ENDPOINT = `${process.env.RUNPOD_API_ENDPOINT}/status/`;
-
-// interface RunPodOutput {
-//   image_url: string;
-//   [key: string]: unknown;
-// }
-
-// interface RunPodStatus {
-//   status: string;
-//   output?: RunPodOutput;
-//   error?: string;
-// }
-
-interface RunPodInput {
-  prompt: string;
-  negative_prompt: string;
-  height: number;
-  width: number;
-  num_inference_steps: number;
-  guidance_scale: number;
-  num_images: number;
-  seed: number;
-  use_lora: boolean;
-  lora_scale: number;
-  scheduler: SchedulerType;
-}
 
 export async function POST(req: Request) {
   try {
@@ -60,8 +36,6 @@ export async function POST(req: Request) {
       guidance_scale = 7.5,
       num_images = 1,
       seed = Math.floor(Math.random() * 65535),
-      use_lora = false,
-      lora_scale = 0.6,
       scheduler = SchedulerType.DPMSolverSDEKarras,
     } = params;
 
@@ -75,8 +49,6 @@ export async function POST(req: Request) {
         guidance_scale,
         num_images,
         seed,
-        use_lora,
-        lora_scale,
         scheduler,
       } satisfies RunPodInput,
     };
