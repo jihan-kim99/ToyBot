@@ -404,7 +404,7 @@ export default function GeneratePage() {
         open={historyOpen}
         onClose={() => setHistoryOpen(false)}
       >
-        <Box sx={{ width: 400, p: 2, overflowY: "auto" }}>
+        <Box sx={{ width: 400, p: 2, overflowY: "auto", maxWidth: "100%" }}>
           <Box
             sx={{
               display: "flex",

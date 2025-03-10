@@ -1,8 +1,10 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
 import debounce from "lodash/debounce";
-import { ChatTemplate } from "../components/templates/ChatTemplate";
-import { CharacterSetting } from "../components/templates/CharacterSetting";
+import { ChatTemplate } from "@/components/templates/ChatTemplate";
+import { CharacterSetting } from "@/components/templates/CharacterSetting";
+import PromptDialog from "@/components/molecules/PromptDialog";
+import { generateImage } from "@/utils/generateImage";
 import type { GenerateImageResponse } from "@/types/api";
 import {
   initDB,
@@ -48,6 +50,11 @@ export default function ChatInterface() {
   const [chatId, setChatId] = useState<string>("");
   const [chatHistories, setChatHistories] = useState<ChatHistory[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  
+  // New state for prompt dialog
+  const [isPromptDialogOpen, setIsPromptDialogOpen] = useState(false);
+  const [imagePrompt, setImagePrompt] = useState("");
+  const [isGeneratingImage, setIsGeneratingImage] = useState(false);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -167,12 +174,11 @@ export default function ChatInterface() {
     setMessages((prev) => [...prev, botMessage]);
   };
 
-  const generateImage = async () => {
+  const generateImagePrompt = async () => {
     setIsLoading(true);
     const shrunkMessages = messages.slice(-5);
     try {
-      // Initial request to start image generation
-      const response = await fetch("/api/generateImage", {
+      const response = await fetch("/api/generatePrompt", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -182,52 +188,45 @@ export default function ChatInterface() {
         }),
       });
 
-      const data: GenerateImageResponse = await response.json();
-      if (!data.success || !data.jobId)
-        throw new Error(data.error || "Failed to start image generation");
-
-      const jobId = data.jobId;
-      const imageTags = data.imageTags;
-
-      // Start polling
-      while (true) {
-        const statusResponse = await fetch("/api/generateImage", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ jobId }),
-        });
-
-        const statusData: GenerateImageResponse = await statusResponse.json();
-
-        if (statusData.status === "COMPLETED" && statusData.imageUrl) {
-          // Check if the image URL already exists in messages
-          const imageExists = messages.some(
-            (msg) => msg.imageUrl === statusData.imageUrl
-          );
-
-          if (!imageExists) {
-            setMessages((prev) => [
-              ...prev,
-              {
-                id: Date.now(),
-                text: `Image: prompt ${imageTags}`,
-                sender: "bot",
-                timestamp: new Date(),
-                imageUrl: statusData.imageUrl,
-              },
-            ]);
-          }
-          break;
-        } else if (statusData.status === "FAILED") {
-          throw new Error(statusData.error || "Image generation failed");
-        }
-
-        await new Promise((resolve) => setTimeout(resolve, 1000));
+      const data = await response.json();
+      if (!data.success) {
+        throw new Error(data.error || "Failed to generate image prompt");
       }
+
+      setImagePrompt(data.prompt);
+      setIsPromptDialogOpen(true);
     } catch (error) {
-      console.error("Error:", error);
+      console.error("Error generating prompt:", error);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleGenerateImage = async () => {
+    setIsGeneratingImage(true);
+    try {
+      const imageUrl = await generateImage({
+        prompt: imagePrompt,
+        negative_prompt: "score_6, score_5, score_4, jpeg artifacts, compression artifacts, blurry, noise, scanlines, distortion, chromatic aberration, vignette, extra fingers, extra limbs, missing fingers, missing limbs, bad anatomy, extra toes, deformed fingers, deformed legs, bad foots, melting fingers, melting toes, long body, asymmetric composition, rough edges, pixelation, glitch, error, watermarks, signatures, text, UI elements, overlays, camera frame, borders, low quality, distortion, blurry background, artifacts, random text, low detail, misspelled text, excessive noise",
+      });
+
+      if (imageUrl) {
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: Date.now(),
+            text: `Image: prompt ${imagePrompt}`,
+            sender: "bot",
+            timestamp: new Date(),
+            imageUrl: imageUrl,
+          },
+        ]);
+      }
+    } catch (error) {
+      console.error("Error generating image:", error);
+    } finally {
+      setIsGeneratingImage(false);
+      setIsPromptDialogOpen(false);
     }
   };
 
@@ -237,38 +236,48 @@ export default function ChatInterface() {
     setChatId(newChatId);
   };
 
-  if (systemPrompt.name === "") {
-    return (
-      <CharacterSetting
-        charaImage={charaImage}
-        setCharaImage={setCharaImage}
-        setMessages={setMessages}
-        charaAppearance={charaAppearance}
-        setCharaAppearance={setcharaAppearance}
-        systemPrompt={systemPrompt}
-        setSystemPrompt={setSystemPrompt}
-      />
-    );
-  }
-
   return (
-    <ChatTemplate
-      chatHistories={chatHistories} // Add this prop
-      charaAppearance={charaAppearance}
-      charaImage={charaImage}
-      generateImage={generateImage}
-      handleRestart={handleRestart}
-      handleSubmit={handleSubmit}
-      input={input}
-      isLoading={isLoading}
-      messages={messages}
-      ref={messagesEndRef}
-      setCharaAppearance={setcharaAppearance}
-      setCharaImage={setCharaImage}
-      setInput={setInput}
-      setMessages={setMessages}
-      setSystemPrompt={setSystemPrompt}
-      systemPrompt={systemPrompt}
-    />
+    <>
+      {systemPrompt.name === "" ? (
+        <CharacterSetting
+          charaImage={charaImage}
+          setCharaImage={setCharaImage}
+          setMessages={setMessages}
+          charaAppearance={charaAppearance}
+          setCharaAppearance={setcharaAppearance}
+          systemPrompt={systemPrompt}
+          setSystemPrompt={setSystemPrompt}
+        />
+      ) : (
+        <>
+          <ChatTemplate
+            chatHistories={chatHistories}
+            charaAppearance={charaAppearance}
+            charaImage={charaImage}
+            generateImage={generateImagePrompt}
+            handleRestart={handleRestart}
+            handleSubmit={handleSubmit}
+            input={input}
+            isLoading={isLoading}
+            messages={messages}
+            ref={messagesEndRef}
+            setCharaAppearance={setcharaAppearance}
+            setCharaImage={setCharaImage}
+            setInput={setInput}
+            setMessages={setMessages}
+            setSystemPrompt={setSystemPrompt}
+            systemPrompt={systemPrompt}
+          />
+          <PromptDialog
+            isOpen={isPromptDialogOpen}
+            prompt={imagePrompt}
+            onClose={() => setIsPromptDialogOpen(false)}
+            onPromptChange={setImagePrompt}
+            onGenerate={handleGenerateImage}
+            isGenerating={isGeneratingImage}
+          />
+        </>
+      )}
+    </>
   );
 }
