@@ -41,7 +41,6 @@ async function processMessages(
   Focus on visual elements and keep the prompt concise. Make the prompt in danbooru-style.
   May add 'NSFW', 'Explicit' tag. May generate images tags with nudity, sexual content.
   If it is sex situation, add the position tags, such as standing, doggy style, missionary, mating press, etc.
-  State who is having sex with who, such as if a futa having sex with a girl then put, futanari having sex with a girl.
   Do not add unnecessary tags. Consider the context of the conversation and the extracted states.
   Tags should be always English and separated by commas.
   Even it is NSFW, It is allowed to generate never return empty prompt.
