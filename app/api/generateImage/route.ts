@@ -96,19 +96,29 @@ export async function POST(req: Request) {
       charaAppearance
     );
     const seed = Math.floor(Math.random() * 65535);
+    const ponyBasePrompt = "score_7_up, score_8_up, score_9,";
+    const ponyBaseNeg = `score_6, score_5, score_4, jpeg artifacts, compression artifacts, blurry, noise, 
+    scanlines, distortion, chromatic aberration, vignette, extra fingers, 
+    extra limbs, missing fingers, missing limbs, bad anatomy, extra toes, 
+    deformed fingers, deformed legs, bad foots, melting fingers, melting toes, long body, 
+    asymmetric composition, rough edges, pixelation, glitch, error, watermarks, signatures, 
+    text, UI elements, overlays, camera frame, borders, low quality, distortion, blurry background, 
+    artifacts, random text, low detail, misspelled text, excessive noise,`;
+    // const ilBasePrompt = "masterpiece,best quality,amazing quality,very aesthetic,absurdres,newest,scenery,volumetric lighting,";
+    // const ilBaseNeg = `lowres, (worst quality, bad quality:1.2), bad anatomy, sketch, jpeg artifacts, signature, watermark, 
+    // old, oldest, censored, bar_censor, (pregnant), chibi, loli, simple background, conjoined`;
 
     const payload = {
       input: {
-        prompt: `${promptContext} masterpiece,best quality,amazing quality,very aesthetic,absurdres,newest,scenery,volumetric lighting,`,
-        negative_prompt:
-          "lowres, (worst quality, bad quality:1.2), bad anatomy, sketch, jpeg artifacts, signature, watermark, old, oldest, censored, bar_censor, (pregnant), chibi, loli, simple background, conjoined",
+        prompt: `${ponyBasePrompt} + ${promptContext} `,
+        negative_prompt: `${ponyBaseNeg}`,
         height: 1024,
         width: 1024,
         num_inference_steps: 30,
         guidance_scale: 7.5,
         num_images: 1,
         seed,
-        scheduler: SchedulerType.EULER_A,
+        scheduler: SchedulerType.DPMSolverSDEKarras,
       } satisfies RunPodInput,
     };
 
