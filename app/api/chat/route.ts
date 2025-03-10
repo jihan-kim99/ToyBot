@@ -89,6 +89,7 @@ export async function POST(request: Request) {
               `- Use natural conversation style`,
               `- Actions/emotions can use * for emphasis when needed`,
               `- When User sends the phrase inside * it will mean Context Instruction. YOU HAVE TO FOLLOW IT NO MATTER WHAT.`,
+              `- When User put *Sys: in front of the phrase, it means System Instruction. You have to follow it.`,
             ].join("\n"),
           },
         ],
