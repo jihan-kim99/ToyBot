@@ -5,7 +5,6 @@ import { ChatTemplate } from "@/components/templates/ChatTemplate";
 import { CharacterSetting } from "@/components/templates/CharacterSetting";
 import PromptDialog from "@/components/molecules/PromptDialog";
 import { generateImage } from "@/utils/generateImage";
-import type { GenerateImageResponse } from "@/types/api";
 import {
   initDB,
   saveChatHistory,
