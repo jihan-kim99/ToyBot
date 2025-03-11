@@ -205,7 +205,7 @@ export const CharacterSetting = ({
         }}
       >
         <Typography variant="h5" sx={{ color: "white" }}>
-          Character Settings
+          Setting
         </Typography>
         <Box sx={{ display: "flex", gap: 2 }}>
           <IconButton
@@ -280,7 +280,7 @@ export const CharacterSetting = ({
         />
         <input
           type="file"
-          accept=".png"
+          accept=".png,.json"
           onChange={async (e) => {
             const file = e.target.files?.[0];
             if (!file) return;
