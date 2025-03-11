@@ -68,22 +68,20 @@ export async function POST(req: Request) {
       charaAppearance
     );
 
-
     // const ponyBasePrompt = "score_7_up, score_8_up, score_9,";
-    const ilBasePrompt = `
-    master piece, best quality, very aesthetic, absurdres, 
-    amazing quality, perfect hands, best hands, perfect anatomy, 
-    perfect proportion, extremely detailed face, extremely smooth skin, 
-    extremely detailed eyes
-    `;
+    const ilBasePrompt = [
+      "master piece, best quality, very aesthetic, absurdres, ",
+      "amazing quality, perfect hands, best hands, perfect anatomy",
+      "perfect proportion, extremely detailed face, extremely smooth skin",
+      "extremely detailed eyes",
+    ].join(" ");
     // const ponyNeg = "score_6, score_5, score_4, jpeg artifacts, compression artifacts, blurry, noise, scanlines, distortion, chromatic aberration, vignette, extra fingers, extra limbs, missing fingers, missing limbs, bad anatomy, extra toes, deformed fingers, deformed legs, bad foots, melting fingers, melting toes, long body, asymmetric composition, rough edges, pixelation, glitch, error, watermarks, signatures, text, UI elements, overlays, camera frame, borders, low quality, distortion, blurry background, artifacts, random text, low detail, misspelled text, excessive noise";
     const ilNeg = `worst aesthetic, worst quality, text,watermark,bad anatomy, bad proportions, extra limbs, extra digit, extra legs, extra legs and arms, disfigured, missing arms, too many fingers, fused fingers, missing fingers, unclear eyes, username, mammal, anthro, furry, ambiguous_form, feral, semi-anthro,`;
 
-    
     const fullPrompt = `${ilBasePrompt} ${promptContext}`;
     const negative_prompt = ilNeg;
     console.log("Generated prompt:", fullPrompt);
-    
+
     return NextResponse.json({
       success: true,
       prompt: fullPrompt,
@@ -91,9 +89,12 @@ export async function POST(req: Request) {
       rawPrompt: promptContext,
     });
   } catch (error) {
-    return NextResponse.json({
-      success: false,
-      error: error instanceof Error ? error.message : "Unknown error",
-    }, { status: 500 });
+    return NextResponse.json(
+      {
+        success: false,
+        error: error instanceof Error ? error.message : "Unknown error",
+      },
+      { status: 500 }
+    );
   }
 }
