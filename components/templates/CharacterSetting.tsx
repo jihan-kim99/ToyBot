@@ -168,7 +168,7 @@ export const CharacterSetting = ({
       setIsDragging(false);
 
       const file = e.dataTransfer.files[0];
-      if (!file || !file.name.endsWith(".png")) return;
+      if (!file || (!file.name.endsWith(".png") && !file.name.endsWith(".json"))) return;
 
       const result = await decodeCharacterCard(file);
       if (result) {
@@ -225,7 +225,20 @@ export const CharacterSetting = ({
               },
             }}
           >
-            Visit JannyAI
+            JanAI
+          </Button>
+          <Button
+            href="https://chub.ai/"
+            target="_blank"
+            rel="noopener noreferrer"
+            sx={{
+              color: "white",
+              "&:hover": {
+                color: whatsappTheme.lightGreen,
+              },
+            }}
+          >
+            Chub
           </Button>
         </Box>
       </Box>
@@ -291,7 +304,7 @@ export const CharacterSetting = ({
                 zIndex: 1,
               }}
             >
-              Import Character Card
+              Import Card or Json
             </Button>
           </label>
         </Box>

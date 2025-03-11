@@ -5,4 +5,5 @@ export interface CharacterData {
   mes_example?: string;
   scenario?: string;
   first_mes?: string;
+  data?: CharacterData;
 }

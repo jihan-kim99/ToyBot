@@ -7,24 +7,43 @@ function decodeBase64(str: string) {
 }
 
 const processCharacterData = (characterData: CharacterData) => {
+  let chara = characterData;
   // Required fields
-  if (!characterData.name || !characterData.description) {
-    throw new Error("Name and description are required");
+  if (!chara.name || !chara.description) {
+    chara = chara.data || {};
+    if(!chara.name || !chara.description){
+      throw new Error("Name and description are required");
+    }
   }
 
   // Optional fields with defaults
   const processedData = {
-    name: characterData.name.trim(),
-    description: characterData.description.trim(),
-    mes_example: characterData.mes_example?.trim() || "",
-    scenario: characterData.scenario?.trim() || "No specific scenario",
-    first_mes: characterData.first_mes?.trim() || "Hello!",
+    name: chara.name.trim(),
+    description: chara.description.trim(),
+    mes_example: chara.mes_example?.trim() || "",
+    scenario: chara.scenario?.trim() || "No specific scenario",
+    first_mes: chara.first_mes?.trim() || "Hello!",
   };
 
   return processedData;
 };
 
 const decodeCharacterCard = async (file: File) => {
+  if(file.name.endsWith(".json")){
+    try {
+      const jsonData = await file.text();
+      const rawCharacterData = JSON.parse(jsonData);
+      const characterData = processCharacterData(rawCharacterData);
+      return {
+        characterData,
+        imageUrl : ""
+      };
+    }
+    catch (error) {
+      console.error("Error:", error);
+    }
+  }
+
   try {
     const arrayBuffer = await file.arrayBuffer();
     const bytes = new Uint8Array(arrayBuffer);
