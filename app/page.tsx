@@ -49,7 +49,7 @@ export default function ChatInterface() {
   const [chatId, setChatId] = useState<string>("");
   const [chatHistories, setChatHistories] = useState<ChatHistory[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  
+
   const [isPromptDialogOpen, setIsPromptDialogOpen] = useState(false);
   const [imagePrompt, setImagePrompt] = useState("");
   const [imageNeg, setImageNeg] = useState("");
@@ -182,8 +182,8 @@ export default function ChatInterface() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           messages: shrunkMessages,
-          systemPrompt,
-          charaAppearance,
+          systemPrompt: JSON.stringify(systemPrompt),
+          charaAppearance: charaAppearance,
         }),
       });
 
@@ -204,7 +204,6 @@ export default function ChatInterface() {
   const handleGenerateImage = async () => {
     setIsGeneratingImage(true);
     try {
-      
       const imageUrl = await generateImage({
         prompt: imagePrompt,
         negative_prompt: imageNeg,
@@ -231,7 +230,14 @@ export default function ChatInterface() {
   };
 
   const handleRestart = () => {
-    setMessages([]);
+    setMessages([
+      {
+        id: Date.now(),
+        text: systemPrompt.first_mes || "Hello!",
+        sender: "bot",
+        timestamp: new Date(),
+      },
+    ]);
     const newChatId = `${systemPrompt.name}-${Date.now()}`;
     setChatId(newChatId);
   };

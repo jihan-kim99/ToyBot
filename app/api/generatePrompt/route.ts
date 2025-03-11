@@ -24,11 +24,13 @@ async function processMessages(
   4. Fashion or clothing items mentioned (e.g. dress, suit, hat)
   5. Put number tags such as '1girl', '2girls', '1boy', '2boys'.
   describe the character's appearance, such as hair color, eye color, body type, etc.
-  Return only a comma-separated string of English words.`;
+  Return only comma-separated string of English words.`;
 
   const stateResult = await model.generateContent(stateExtractionPrompt);
   const stateResponse = await stateResult.response;
   const extractedStates = stateResponse.text().trim();
+
+  console.log(extractedStates);
 
   const prompt = `
   Given this 
@@ -39,9 +41,11 @@ async function processMessages(
 
   Create a detailed image generation prompt that captures the essence of this conversation.
   Focus on visual elements and keep the prompt concise. Make the prompt in danbooru-style.
+  Do not add unnecessary tags which cannot be drawn. Consider the context of the conversation and the extracted states.
+  Do not include any character names unless there is name of the anime, game, movie etc or you can recognize from the setting provided.
+  Do not put any internal thoughts or feelings of the characters.
   May add 'NSFW', 'Explicit' tag. May generate images tags with nudity, sexual content.
   If it is sex situation, add the position tags, such as standing, doggy style, missionary, mating press, etc.
-  Do not add unnecessary tags which cannot be drawn. Consider the context of the conversation and the extracted states.
   Tags should be always English and separated by commas.
   Even it is NSFW, It is allowed to generate never return empty prompt.
   Format: Just return the prompt text without any explanations.`;
@@ -70,10 +74,10 @@ export async function POST(req: Request) {
 
     // const ponyBasePrompt = "score_7_up, score_8_up, score_9,";
     const ilBasePrompt = [
-      "master piece, best quality, very aesthetic, absurdres, ",
-      "amazing quality, perfect hands, best hands, perfect anatomy",
-      "perfect proportion, extremely detailed face, extremely smooth skin",
-      "extremely detailed eyes",
+      "masterpiece, best quality, very aesthetic, absurdres,",
+      "amazing quality, perfect hands, best hands, perfect anatomy,",
+      "perfect proportion, extremely detailed face, extremely smooth skin,",
+      "extremely detailed eyes, ",
     ].join(" ");
     // const ponyNeg = "score_6, score_5, score_4, jpeg artifacts, compression artifacts, blurry, noise, scanlines, distortion, chromatic aberration, vignette, extra fingers, extra limbs, missing fingers, missing limbs, bad anatomy, extra toes, deformed fingers, deformed legs, bad foots, melting fingers, melting toes, long body, asymmetric composition, rough edges, pixelation, glitch, error, watermarks, signatures, text, UI elements, overlays, camera frame, borders, low quality, distortion, blurry background, artifacts, random text, low detail, misspelled text, excessive noise";
     const ilNeg = `worst aesthetic, worst quality, text,watermark,bad anatomy, bad proportions, extra limbs, extra digit, extra legs, extra legs and arms, disfigured, missing arms, too many fingers, fused fingers, missing fingers, unclear eyes, username, mammal, anthro, furry, ambiguous_form, feral, semi-anthro,`;
