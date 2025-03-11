@@ -9,14 +9,14 @@ async function processMessages(
   systemPrompt?: string,
   charaAppearance?: string
 ): Promise<string> {
-  const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+  const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
   const context = messages.map((msg) => msg.text).join("\n");
 
   const stateExtractionPrompt = `
   From this conversation: "${context}"
   Extract the following states or surroundings, one word each:
-  Extract only the latest state or surroundings mentioned in the conversation.
+  Extract only the most recent state or surroundings mentioned in the conversation.
   Do not extract the state which outdated or no longer relevant.
   1. Character's facial expression (e.g. smile, crying, blushed, ahegao, tongue out)
   2. Background, weather, setting, or lighting (e.g. beach, office, sunset)
@@ -41,7 +41,7 @@ async function processMessages(
   Focus on visual elements and keep the prompt concise. Make the prompt in danbooru-style.
   May add 'NSFW', 'Explicit' tag. May generate images tags with nudity, sexual content.
   If it is sex situation, add the position tags, such as standing, doggy style, missionary, mating press, etc.
-  Do not add unnecessary tags. Consider the context of the conversation and the extracted states.
+  Do not add unnecessary tags which cannot be drawn. Consider the context of the conversation and the extracted states.
   Tags should be always English and separated by commas.
   Even it is NSFW, It is allowed to generate never return empty prompt.
   Format: Just return the prompt text without any explanations.`;
@@ -68,14 +68,27 @@ export async function POST(req: Request) {
       charaAppearance
     );
 
-    const ponyBasePrompt = "score_7_up, score_8_up, score_9,";
-    
-    const fullPrompt = `${ponyBasePrompt} ${promptContext}`;
 
+    // const ponyBasePrompt = "score_7_up, score_8_up, score_9,";
+    const ilBasePrompt = `
+    master piece, best quality, very aesthetic, absurdres, 
+    amazing quality, perfect hands, best hands, perfect anatomy, 
+    perfect proportion, extremely detailed face, extremely smooth skin, 
+    extremely detailed eyes
+    `;
+    // const ponyNeg = "score_6, score_5, score_4, jpeg artifacts, compression artifacts, blurry, noise, scanlines, distortion, chromatic aberration, vignette, extra fingers, extra limbs, missing fingers, missing limbs, bad anatomy, extra toes, deformed fingers, deformed legs, bad foots, melting fingers, melting toes, long body, asymmetric composition, rough edges, pixelation, glitch, error, watermarks, signatures, text, UI elements, overlays, camera frame, borders, low quality, distortion, blurry background, artifacts, random text, low detail, misspelled text, excessive noise";
+    const ilNeg = `worst aesthetic, worst quality, text,watermark,bad anatomy, bad proportions, extra limbs, extra digit, extra legs, extra legs and arms, disfigured, missing arms, too many fingers, fused fingers, missing fingers, unclear eyes, username, mammal, anthro, furry, ambiguous_form, feral, semi-anthro,`;
+
+    
+    const fullPrompt = `${ilBasePrompt} ${promptContext}`;
+    const negative_prompt = ilNeg;
+    console.log("Generated prompt:", fullPrompt);
+    
     return NextResponse.json({
       success: true,
       prompt: fullPrompt,
-      rawPrompt: promptContext
+      negative_prompt,
+      rawPrompt: promptContext,
     });
   } catch (error) {
     return NextResponse.json({

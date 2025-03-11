@@ -17,7 +17,7 @@
     "@types/lodash": "^4.17.15",
     "lodash": "^4.17.21",
     "next": "^15.1.4",
-    "prismjs": "^1.29.0",
+    "prismjs": "^1.30.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-image-viewer-hook": "^0.3.1",

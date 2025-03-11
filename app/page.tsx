@@ -50,9 +50,9 @@ export default function ChatInterface() {
   const [chatHistories, setChatHistories] = useState<ChatHistory[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   
-  // New state for prompt dialog
   const [isPromptDialogOpen, setIsPromptDialogOpen] = useState(false);
   const [imagePrompt, setImagePrompt] = useState("");
+  const [imageNeg, setImageNeg] = useState("");
   const [isGeneratingImage, setIsGeneratingImage] = useState(false);
 
   const scrollToBottom = () => {
@@ -191,8 +191,8 @@ export default function ChatInterface() {
       if (!data.success) {
         throw new Error(data.error || "Failed to generate image prompt");
       }
-
       setImagePrompt(data.prompt);
+      setImageNeg(data.negative_prompt);
       setIsPromptDialogOpen(true);
     } catch (error) {
       console.error("Error generating prompt:", error);
@@ -204,9 +204,10 @@ export default function ChatInterface() {
   const handleGenerateImage = async () => {
     setIsGeneratingImage(true);
     try {
+      
       const imageUrl = await generateImage({
         prompt: imagePrompt,
-        negative_prompt: "score_6, score_5, score_4, jpeg artifacts, compression artifacts, blurry, noise, scanlines, distortion, chromatic aberration, vignette, extra fingers, extra limbs, missing fingers, missing limbs, bad anatomy, extra toes, deformed fingers, deformed legs, bad foots, melting fingers, melting toes, long body, asymmetric composition, rough edges, pixelation, glitch, error, watermarks, signatures, text, UI elements, overlays, camera frame, borders, low quality, distortion, blurry background, artifacts, random text, low detail, misspelled text, excessive noise",
+        negative_prompt: imageNeg,
       });
 
       if (imageUrl) {
