@@ -9,11 +9,16 @@ import {
   DialogActions,
   Button,
   Box,
+  Menu,
+  MenuItem,
 } from "@mui/material";
 import SettingsIcon from "@mui/icons-material/Settings";
 import CloseIcon from "@mui/icons-material/Close";
 import AddIcon from "@mui/icons-material/Image";
-import { SetStateAction, useState } from "react";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
+import FullscreenIcon from "@mui/icons-material/Fullscreen";
+import FullscreenExitIcon from "@mui/icons-material/FullscreenExit";
+import { SetStateAction, useState, useEffect } from "react";
 import Avatar from "@mui/material/Avatar";
 import { CharacterSetting } from "../templates/CharacterSetting";
 import { Message } from "@/types/chat";
@@ -44,6 +49,19 @@ export const ChatHeader = ({
   const [open, setOpen] = useState(false);
   const [restartDialogOpen, setRestartDialogOpen] = useState(false);
   const { getOnClick, ImageViewer } = useImageViewer();
+  const [menuAnchor, setMenuAnchor] = useState<null | HTMLElement>(null);
+  const [isFullScreen, setIsFullScreen] = useState(false);
+
+  useEffect(() => {
+    const handleFullScreenChange = () => {
+      setIsFullScreen(!!document.fullscreenElement);
+    };
+
+    document.addEventListener("fullscreenchange", handleFullScreenChange);
+    return () => {
+      document.removeEventListener("fullscreenchange", handleFullScreenChange);
+    };
+  }, []);
 
   const handleOpen = () => {
     setOpen(true);
@@ -58,11 +76,41 @@ export const ChatHeader = ({
     setRestartDialogOpen(false);
   };
 
+  const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
+    setMenuAnchor(event.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setMenuAnchor(null);
+  };
+
+  const toggleFullScreen = () => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch((err) => {
+        console.error(
+          `Error attempting to enable full-screen mode: ${err.message}`
+        );
+      });
+    } else {
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+      }
+    }
+    handleMenuClose();
+  };
+
   return (
     <>
       <AppBar position="static" sx={{ bgcolor: "#075e54" }}>
         <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
-          <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              gap: 2,
+              maxWidth: "70%",
+            }}
+          >
             <Avatar
               src={charaImage || undefined}
               alt="Character"
@@ -74,8 +122,17 @@ export const ChatHeader = ({
                 cursor: charaImage ? "pointer" : "default",
               }}
             />
-            <Box>
-              <Typography variant="subtitle1" sx={{ fontWeight: "bold" }}>
+            <Box sx={{ overflow: "hidden" }}>
+              <Typography
+                variant="subtitle1"
+                sx={{
+                  fontWeight: "bold",
+                  whiteSpace: "nowrap",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  maxWidth: "100%",
+                }}
+              >
                 {systemPrompt.name}
               </Typography>
               <Typography
@@ -89,25 +146,63 @@ export const ChatHeader = ({
           <Box>
             <IconButton
               color="inherit"
-              onClick={() => setRestartDialogOpen(true)}
-              aria-label="restart"
+              onClick={handleMenuOpen}
+              aria-label="more options"
+              aria-controls="header-menu"
+              aria-haspopup="true"
             >
-              <CloseIcon />
+              <MoreVertIcon />
             </IconButton>
-            <IconButton
-              color="inherit"
-              href="/generate"
-              aria-label="character generator"
+            <Menu
+              id="header-menu"
+              anchorEl={menuAnchor}
+              open={Boolean(menuAnchor)}
+              onClose={handleMenuClose}
+              anchorOrigin={{
+                vertical: "top",
+                horizontal: "right",
+              }}
+              transformOrigin={{
+                vertical: "top",
+                horizontal: "right",
+              }}
             >
-              <AddIcon />
-            </IconButton>
-            <IconButton
-              color="inherit"
-              onClick={handleOpen}
-              aria-label="settings"
-            >
-              <SettingsIcon />
-            </IconButton>
+              <MenuItem onClick={toggleFullScreen}>
+                {isFullScreen ? (
+                  <FullscreenExitIcon fontSize="small" sx={{ mr: 1 }} />
+                ) : (
+                  <FullscreenIcon fontSize="small" sx={{ mr: 1 }} />
+                )}
+                {isFullScreen ? "Exit Full Screen" : "Enter Full Screen"}
+              </MenuItem>
+              <MenuItem
+                onClick={() => {
+                  handleMenuClose();
+                  setRestartDialogOpen(true);
+                }}
+              >
+                <CloseIcon fontSize="small" sx={{ mr: 1 }} />
+                Restart Chat
+              </MenuItem>
+              <MenuItem
+                onClick={() => {
+                  handleMenuClose();
+                  window.location.href = "/generate";
+                }}
+              >
+                <AddIcon fontSize="small" sx={{ mr: 1 }} />
+                Generate Character
+              </MenuItem>
+              <MenuItem
+                onClick={() => {
+                  handleMenuClose();
+                  handleOpen();
+                }}
+              >
+                <SettingsIcon fontSize="small" sx={{ mr: 1 }} />
+                Settings
+              </MenuItem>
+            </Menu>
           </Box>
         </Toolbar>
 
