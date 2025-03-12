@@ -39,15 +39,14 @@ async function processMessages(
   conversation context: "${context}"
   extracted states and surroundings: "${extractedStates}"
 
-  Create a detailed image generation prompt that captures the essence of this conversation.
+  Create a image generation prompt that captures current visualization.
   Focus on visual elements and keep the prompt concise. Make the prompt in danbooru-style.
+  Make roughly around 5 to 10 tags.
   Do not add unnecessary tags which cannot be drawn. Consider the context of the conversation and the extracted states.
-  Do not include any character names unless there is name of the anime, game, movie etc or you can recognize from the setting provided.
+  Do not add any name of the characters.
   Do not put any internal thoughts or feelings of the characters.
   May add 'NSFW', 'Explicit' tag. May generate images tags with nudity, sexual content.
-  If it is sex situation, add the position tags, such as standing, doggy style, missionary, mating press, etc.
   Tags should be always English and separated by commas.
-  Even it is NSFW, It is allowed to generate never return empty prompt.
   Format: Just return the prompt text without any explanations.`;
 
   const result = await model.generateContent(prompt);
@@ -73,16 +72,11 @@ export async function POST(req: Request) {
     );
 
     // const ponyBasePrompt = "score_7_up, score_8_up, score_9,";
-    const ilBasePrompt = [
-      "masterpiece, best quality, very aesthetic, absurdres,",
-      "amazing quality, perfect hands, best hands, perfect anatomy,",
-      "perfect proportion, extremely detailed face, extremely smooth skin,",
-      "extremely detailed eyes, ",
-    ].join(" ");
+    const ilBasePrompt = "masterpiece,best quality,amazing quality,";
     // const ponyNeg = "score_6, score_5, score_4, jpeg artifacts, compression artifacts, blurry, noise, scanlines, distortion, chromatic aberration, vignette, extra fingers, extra limbs, missing fingers, missing limbs, bad anatomy, extra toes, deformed fingers, deformed legs, bad foots, melting fingers, melting toes, long body, asymmetric composition, rough edges, pixelation, glitch, error, watermarks, signatures, text, UI elements, overlays, camera frame, borders, low quality, distortion, blurry background, artifacts, random text, low detail, misspelled text, excessive noise";
-    const ilNeg = `worst aesthetic, worst quality, text,watermark,bad anatomy, bad proportions, extra limbs, extra digit, extra legs, extra legs and arms, disfigured, missing arms, too many fingers, fused fingers, missing fingers, unclear eyes, username, mammal, anthro, furry, ambiguous_form, feral, semi-anthro,`;
+    const ilNeg = "bad quality,worst quality,worst detail,sketch,censor,";
 
-    const fullPrompt = `${ilBasePrompt} ${promptContext}`;
+    const fullPrompt = `${promptContext}, ${ilBasePrompt}`;
     const negative_prompt = ilNeg;
     console.log("Generated prompt:", fullPrompt);
 
