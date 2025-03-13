@@ -12,7 +12,7 @@ interface ChatTemplateProps {
   charaImage: string;
   generateImage: () => void;
   handleRestart: () => void;
-  handleSubmit: (e: React.FormEvent) => void;
+  handleSubmit: () => void;
   input: string;
   isLoading: boolean;
   messages: Message[];

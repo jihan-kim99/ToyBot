@@ -7,7 +7,7 @@ interface ChatFormProps {
   input: string;
   isLoading: boolean;
   onInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  onSubmit: (e: React.FormEvent) => void;
+  onSubmit: () => void;
   onGenerateImage: () => void;
 }
 
@@ -19,7 +19,6 @@ export const ChatForm = ({
   onGenerateImage,
 }: ChatFormProps) => (
   <Box
-    onSubmit={onSubmit}
     sx={{
       p: 2,
       bgcolor: "#f0f0f0",
@@ -28,7 +27,12 @@ export const ChatForm = ({
     }}
   >
     <ImageButton disabled={isLoading} onClick={onGenerateImage} />
-    <ChatInput value={input} onChange={onInputChange} disabled={isLoading} />
-    <SendButton disabled={isLoading} />
+    <ChatInput
+      value={input}
+      onChange={onInputChange}
+      disabled={isLoading}
+      onSubmit={onSubmit}
+    />
+    <SendButton disabled={isLoading} onSubmit={onSubmit} />
   </Box>
 );

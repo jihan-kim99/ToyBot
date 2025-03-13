@@ -2,10 +2,11 @@ import { IconButton } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
 
 interface SendButtonProps {
+  onSubmit: () => void;
   disabled: boolean;
 }
 
-export const SendButton = ({ disabled }: SendButtonProps) => (
+export const SendButton = ({ disabled, onSubmit }: SendButtonProps) => (
   <IconButton
     type="submit"
     disabled={disabled}
@@ -18,6 +19,7 @@ export const SendButton = ({ disabled }: SendButtonProps) => (
       width: 48,
       height: 48,
     }}
+    onClick={onSubmit}
   >
     <SendIcon />
   </IconButton>
