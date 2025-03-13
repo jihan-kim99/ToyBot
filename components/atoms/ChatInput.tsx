@@ -14,7 +14,8 @@ export const ChatInput = ({ value, onChange, onSubmit }: ChatInputProps) => (
     value={value}
     onChange={onChange}
     onKeyDown={(e) => {
-      if (e.key === "Enter") {
+      if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
         onSubmit();
       }
     }}
