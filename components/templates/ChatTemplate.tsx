@@ -3,7 +3,7 @@ import { Dispatch, forwardRef, SetStateAction } from "react";
 import { Message } from "../../types/chat";
 import { ChatHeader } from "../molecules/ChatHeader";
 import { ChatBody } from "../organisms/ChatBody";
-import { ChatForm } from "../organisms/ChatForm";
+import { ChatFooter } from "../organisms/ChatForm";
 import { CharacterData } from "@/types/character";
 import { ChatHistory } from "@/utils/indexedDB";
 
@@ -62,7 +62,7 @@ export const ChatTemplate = forwardRef<HTMLDivElement, ChatTemplateProps>(
           handleRestart={handleRestart}
         />
         <ChatBody messages={messages} isLoading={isLoading} ref={ref} />
-        <ChatForm
+        <ChatFooter
           input={input}
           isLoading={isLoading}
           onInputChange={handleInputChange}

@@ -3,7 +3,7 @@ import { ChatInput } from "../atoms/ChatInput";
 import { SendButton } from "../atoms/SendButton";
 import { ImageButton } from "../atoms/ImageButton";
 
-interface ChatFormProps {
+interface ChatFooter {
   input: string;
   isLoading: boolean;
   onInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
@@ -11,13 +11,13 @@ interface ChatFormProps {
   onGenerateImage: () => void;
 }
 
-export const ChatForm = ({
+export const ChatFooter = ({
   input,
   isLoading,
   onInputChange,
   onSubmit,
   onGenerateImage,
-}: ChatFormProps) => (
+}: ChatFooter) => (
   <Box
     sx={{
       p: 2,

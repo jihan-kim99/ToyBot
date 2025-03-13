@@ -23,7 +23,6 @@ export const ChatInput = ({
         onSubmit();
       }
     }}
-    autoComplete="off"
     placeholder="Type a message"
     sx={{
       "& .MuiOutlinedInput-root": {
