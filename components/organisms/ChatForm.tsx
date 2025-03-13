@@ -19,7 +19,6 @@ export const ChatForm = ({
   onGenerateImage,
 }: ChatFormProps) => (
   <Box
-    component="form"
     onSubmit={onSubmit}
     sx={{
       p: 2,
