@@ -27,12 +27,7 @@ export const ChatFooter = ({
     }}
   >
     <ImageButton disabled={isLoading} onClick={onGenerateImage} />
-    <ChatInput
-      value={input}
-      onChange={onInputChange}
-      disabled={isLoading}
-      onSubmit={onSubmit}
-    />
+    <ChatInput value={input} onChange={onInputChange} onSubmit={onSubmit} />
     <SendButton disabled={isLoading} onSubmit={onSubmit} />
   </Box>
 );
