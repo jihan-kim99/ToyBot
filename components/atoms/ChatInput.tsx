@@ -18,6 +18,7 @@ export const ChatInput = ({
     value={value}
     onChange={onChange}
     disabled={disabled}
+    autoComplete="new-password"
     onKeyDown={(e) => {
       if (e.key === "Enter") {
         onSubmit();

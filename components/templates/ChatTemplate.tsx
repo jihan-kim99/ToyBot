@@ -3,7 +3,7 @@ import { Dispatch, forwardRef, SetStateAction } from "react";
 import { Message } from "../../types/chat";
 import { ChatHeader } from "../molecules/ChatHeader";
 import { ChatBody } from "../organisms/ChatBody";
-import { ChatFooter } from "../organisms/ChatForm";
+import { ChatFooter } from "../organisms/ChatFooter";
 import { CharacterData } from "@/types/character";
 import { ChatHistory } from "@/utils/indexedDB";
 
