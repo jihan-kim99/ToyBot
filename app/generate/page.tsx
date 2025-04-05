@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import { generateImage } from "@/utils/generateImage";
 import { SchedulerType, getSchedulerTypes } from "@/utils/schedulerTypes";
 import { useImageViewer } from "react-image-viewer-hook";
-import Grid from "@mui/material/Grid2";
 import { styled } from "@mui/material/styles";
 import {
   Box,
@@ -16,6 +15,7 @@ import {
   Typography,
   CircularProgress,
   Drawer,
+  Grid,
   Card,
   CardMedia,
   CardContent,
