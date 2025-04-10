@@ -22,6 +22,7 @@ import {
   IconButton,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
+import SwapVertIcon from "@mui/icons-material/SwapVert";
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === "dark" ? "#1A2027" : "#fff",
@@ -73,6 +74,14 @@ export default function GeneratePage() {
   ) => {
     setPromptHistory(newHistory);
     localStorage.setItem("promptHistory", JSON.stringify(newHistory));
+  };
+
+  const handleSwap = () => {
+    setParams((prev) => ({
+      ...prev,
+      height: prev.width,
+      width: prev.height,
+    }));
   };
 
   const processImageForStorage = async (imageUrl: string) => {
@@ -231,13 +240,13 @@ export default function GeneratePage() {
           <Item elevation={3}>
             <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
               <Typography variant="h4" component="h1" sx={{ flexGrow: 1 }}>
-                Image Generation
+                ImGen
               </Typography>
               <Button variant="outlined" href="/" sx={{ mr: 2 }}>
-                Back
+                back
               </Button>
               <Button variant="outlined" onClick={() => setHistoryOpen(true)}>
-                History
+                hist
               </Button>
             </Box>
             <Box component="form" onSubmit={handleSubmit} noValidate>
@@ -270,7 +279,7 @@ export default function GeneratePage() {
                     }
                   />
                 </Grid>
-                <Grid size={{ xs: 12, sm: 6 }}>
+                <Grid size={{ xs: 10, sm: 4 }}>
                   <TextField
                     fullWidth
                     type="number"
@@ -280,6 +289,22 @@ export default function GeneratePage() {
                       setParams({ ...params, width: parseInt(e.target.value) })
                     }
                   />
+                </Grid>
+                <Grid size={{ xs: 2, sm: 2 }}>
+                  <Button
+                    variant="outlined"
+                    size="small"
+                    sx={{
+                      mt: 1,
+                      minWidth: "32px",
+                      width: "32px",
+                      height: "32px",
+                      p: 0.5,
+                    }}
+                    onClick={handleSwap}
+                  >
+                    <SwapVertIcon fontSize="small" sx={{ fontSize: "16px" }} />
+                  </Button>
                 </Grid>
                 <Grid size={{ xs: 12, sm: 6 }}>
                   <TextField
