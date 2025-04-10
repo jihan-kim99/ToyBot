@@ -20,9 +20,11 @@ import {
   CardMedia,
   CardContent,
   IconButton,
+  Stack,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import SwapVertIcon from "@mui/icons-material/SwapVert";
+import CloseButton from "@mui/icons-material/Close";
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === "dark" ? "#1A2027" : "#fff",
@@ -431,10 +433,9 @@ export default function GeneratePage() {
       >
         <Box
           sx={{
-            width: { xs: "85%", sm: "400px" },
-            p: 2,
+            width: { xs: "100%", sm: "400px" },
             overflowY: "auto",
-            maxWidth: "100%",
+            p: 2,
           }}
         >
           <Box
@@ -445,14 +446,25 @@ export default function GeneratePage() {
               mb: 2,
             }}
           >
-            <Typography variant="h6">Prompt History</Typography>
-            <Button
-              variant="outlined"
-              size="small"
-              onClick={() => setIsGalleryView(!isGalleryView)}
-            >
-              {isGalleryView ? "List View" : "Gallery View"}
-            </Button>
+            <Typography variant="h6">History</Typography>
+            <Stack direction="row" spacing={1}>
+              <Button
+                variant="outlined"
+                size="small"
+                onClick={() => setIsGalleryView(!isGalleryView)}
+              >
+                {isGalleryView ? "Hist" : "Gall"}
+              </Button>
+              <IconButton
+                size="small"
+                onClick={() => {
+                  setHistoryOpen(false);
+                }}
+                sx={{ ml: 1 }}
+              >
+                <CloseButton fontSize="small" />
+              </IconButton>
+            </Stack>
           </Box>
 
           {isGalleryView ? (
@@ -511,7 +523,7 @@ export default function GeneratePage() {
                 >
                   <CardMedia
                     component="img"
-                    height="200"
+                    height="100%"
                     image={item.imageUrl}
                     alt={item.prompt}
                     sx={{ objectFit: "cover" }}
@@ -544,9 +556,7 @@ export default function GeneratePage() {
                       Prompt:
                     </Typography>
                     <Typography variant="body2" sx={{ mb: 1 }}>
-                      {item.prompt.length > 100
-                        ? item.prompt.substring(0, 100) + "..."
-                        : item.prompt}
+                      {item.prompt}
                     </Typography>
                     <Typography
                       variant="subtitle2"
