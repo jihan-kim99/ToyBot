@@ -35,9 +35,9 @@ export default function GeneratePage() {
   const [params, setParams] = useState({
     prompt: "",
     negative_prompt: "",
-    height: 1024,
+    height: 1360,
     width: 1024,
-    num_inference_steps: 28,
+    num_inference_steps: 30,
     guidance_scale: 5.5,
     scheduler: SchedulerType.EULER_A,
   });
@@ -404,7 +404,14 @@ export default function GeneratePage() {
         open={historyOpen}
         onClose={() => setHistoryOpen(false)}
       >
-        <Box sx={{ width: 400, p: 2, overflowY: "auto", maxWidth: "100%" }}>
+        <Box
+          sx={{
+            width: { xs: "85%", sm: "400px" },
+            p: 2,
+            overflowY: "auto",
+            maxWidth: "100%",
+          }}
+        >
           <Box
             sx={{
               display: "flex",
