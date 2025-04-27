@@ -40,9 +40,9 @@ export default function GeneratePage() {
     negative_prompt: "",
     height: 1360,
     width: 1024,
-    num_inference_steps: 30,
-    guidance_scale: 5.5,
-    scheduler: SchedulerType.EULER_A,
+    num_inference_steps: 20,
+    guidance_scale: 6,
+    scheduler: SchedulerType.DPMSolverMultistepKarras,
   });
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
