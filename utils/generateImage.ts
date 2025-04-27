@@ -24,11 +24,11 @@ export const generateImage = async (params: GenerationParams) => {
         ...params,
         height: params.height || 1024,
         width: params.width || 1024,
-        num_inference_steps: params.num_inference_steps || 28,
-        guidance_scale: params.guidance_scale || 5.5,
+        num_inference_steps: params.num_inference_steps || 20,
+        guidance_scale: params.guidance_scale || 6,
         num_images: params.num_images || 1,
         seed: params.seed || Math.floor(Math.random() * 2147483647),
-        scheduler: params.scheduler || SchedulerType.EULER_A,
+        scheduler: params.scheduler || SchedulerType.DPMSolverMultistepKarras,
       }),
     });
 
