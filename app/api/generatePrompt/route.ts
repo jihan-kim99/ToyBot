@@ -37,21 +37,25 @@ async function processMessages(
 
   const context = messages.map((msg) => msg.text).join("\n");
 
-  const stateExtractionPrompt = `
-  From this conversation: "${context}"
-  Extract the following states or surroundings, one word each:
-  Extract only the most recent state or surroundings mentioned in the conversation.
-  Do not extract the state which outdated or no longer relevant.
-  1. Character's facial expression (e.g. smile, crying, blushed, ahegao, tongue out)
-  2. Background, weather, setting, or lighting (e.g. beach, office, sunset)
-  3. Props or objects mentioned (e.g. car, tree, computer)
-  4. Fashion or clothing items mentioned (e.g. dress, suit, hat)
-  5. Put number tags such as '1girl', '2girls', '1boy', '2boys'.
-  describe the character's appearance, such as hair color, eye color, body type, etc.
-  Return only comma-separated string of English words.`;
+  const prompt = `
+  Given this conversation: "${context}"
+  Character prompt: "${systemPrompt}"
+  Original character appearance: "${charaAppearance}"
 
-  // Use startChat with safetySettings to avoid filtering
-  const modelChat = model.startChat({
+  Create a danbooru-style image generation prompt that captures the current visualization from the conversation.
+  
+  Instructions:
+  1. Extract the most recent visual states from the conversation (facial expressions, background, objects, clothing)
+  2. Focus on visual elements that can be drawn
+  3. Use 5-10 concise English tags separated by commas
+  4. Include character count tags like '1girl', '2girls', '1boy', '2boys' if relevant
+  5. May include 'NSFW', 'Explicit' tags if the conversation context suggests it
+  6. Do not include character names or internal thoughts/feelings
+  7. Only extract states that are current and relevant, ignore outdated information
+
+  Return only the comma-separated tags without explanations.`;
+
+  const chat = model.startChat({
     history: [],
     safetySettings: [
       {
@@ -73,30 +77,7 @@ async function processMessages(
     ],
   });
 
-  const stateResult = await modelChat.sendMessage(stateExtractionPrompt);
-  const stateResponse = await stateResult.response;
-  const extractedStates = stateResponse.text().trim();
-
-  console.log(extractedStates);
-
-  const prompt = `
-  Given this 
-  character prompt: "${systemPrompt}"
-  original character appearance: "${charaAppearance}"
-  conversation context: "${context}"
-  extracted states and surroundings: "${extractedStates}"
-
-  Create a image generation prompt that captures current visualization.
-  Focus on visual elements and keep the prompt concise. Make the prompt in danbooru-style.
-  Make roughly around 5 to 10 tags.
-  Do not add unnecessary tags which cannot be drawn. Consider the context of the conversation and the extracted states.
-  Do not add any name of the characters.
-  Do not put any internal thoughts or feelings of the characters.
-  May add 'NSFW', 'Explicit' tag. May generate images tags with nudity, sexual content.
-  Tags should be always English and separated by commas.
-  Format: Just return the prompt text without any explanations.`;
-
-  const result = await model.generateContent(prompt);
+  const result = await chat.sendMessage(prompt);
   const response = await result.response;
   const processedPrompt = response.text().trim();
 
