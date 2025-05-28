@@ -187,15 +187,23 @@ export default function ChatInterface() {
       });
 
       const data = await response.json();
-      if (!data.success) {
-        throw new Error(data.error || "Failed to generate image prompt");
+      if (data.success) {
+        setImagePrompt(data.prompt);
+        setImageNeg(data.negative_prompt);
+      } else {
+        console.error("Error generating prompt:", data.error);
+        // Set fallback prompt when API fails
+        setImagePrompt("masterpiece,best quality,amazing quality,");
+        setImageNeg("bad quality,worst quality,worst detail,sketch,censor,");
       }
-      setImagePrompt(data.prompt);
-      setImageNeg(data.negative_prompt);
-      setIsPromptDialogOpen(true);
     } catch (error) {
       console.error("Error generating prompt:", error);
+      // Set fallback prompt when request fails
+      setImagePrompt("masterpiece,best quality,amazing quality,");
+      setImageNeg("bad quality,worst quality,worst detail,sketch,censor,");
     } finally {
+      // Always show the dialog regardless of success or failure
+      setIsPromptDialogOpen(true);
       setIsLoading(false);
     }
   };

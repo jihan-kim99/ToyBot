@@ -22,13 +22,13 @@ export const generateImage = async (params: GenerationParams) => {
       },
       body: JSON.stringify({
         ...params,
-        height: params.height || 1024,
+        height: params.height || 1360,
         width: params.width || 1024,
         num_inference_steps: params.num_inference_steps || 20,
-        guidance_scale: params.guidance_scale || 6,
+        guidance_scale: params.guidance_scale || 5,
         num_images: params.num_images || 1,
         seed: params.seed || Math.floor(Math.random() * 2147483647),
-        scheduler: params.scheduler || SchedulerType.DPMSolverMultistepKarras,
+        scheduler: params.scheduler || SchedulerType.EULER_A,
       }),
     });
 

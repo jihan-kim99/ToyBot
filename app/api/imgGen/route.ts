@@ -36,7 +36,7 @@ export async function POST(req: Request) {
       guidance_scale = 7.5,
       num_images = 1,
       seed = Math.floor(Math.random() * 65535),
-      scheduler = SchedulerType.DPMSolverSDEKarras,
+      scheduler = SchedulerType.EULER_A,
     } = params;
 
     const payload = {

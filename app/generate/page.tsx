@@ -42,7 +42,7 @@ export default function GeneratePage() {
     width: 1024,
     num_inference_steps: 20,
     guidance_scale: 6,
-    scheduler: SchedulerType.DPMSolverMultistepKarras,
+    scheduler: SchedulerType.EULER_A,
   });
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
