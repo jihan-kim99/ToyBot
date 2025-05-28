@@ -50,7 +50,30 @@ async function processMessages(
   describe the character's appearance, such as hair color, eye color, body type, etc.
   Return only comma-separated string of English words.`;
 
-  const stateResult = await model.generateContent(stateExtractionPrompt);
+  // Use startChat with safetySettings to avoid filtering
+  const modelChat = model.startChat({
+    history: [],
+    safetySettings: [
+      {
+        category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+        threshold: HarmBlockThreshold.BLOCK_NONE,
+      },
+      {
+        category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+        threshold: HarmBlockThreshold.BLOCK_NONE,
+      },
+      {
+        category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+        threshold: HarmBlockThreshold.BLOCK_NONE,
+      },
+      {
+        category: HarmCategory.HARM_CATEGORY_HARASSMENT,
+        threshold: HarmBlockThreshold.BLOCK_NONE,
+      },
+    ],
+  });
+
+  const stateResult = await modelChat.sendMessage(stateExtractionPrompt);
   const stateResponse = await stateResult.response;
   const extractedStates = stateResponse.text().trim();
 
