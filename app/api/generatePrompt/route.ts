@@ -9,7 +9,9 @@ async function processMessages(
   systemPrompt?: string,
   charaAppearance?: string
 ): Promise<string> {
-  const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+  const model = genAI.getGenerativeModel({
+    model: "models/gemini-2.5-flash-preview-05-20",
+  });
 
   const context = messages.map((msg) => msg.text).join("\n");
 
