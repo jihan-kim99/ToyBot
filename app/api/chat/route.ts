@@ -18,7 +18,7 @@ export async function POST(request: Request) {
   try {
     const { message, history, systemPrompt } = await request.json();
     const model = genAI.getGenerativeModel({
-      model: "models/gemini-2.5-flash-preview-05-20",
+      model: "gemini-2.5-flash-preview-05-20",
       safetySettings: [
         {
           category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
