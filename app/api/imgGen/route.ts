@@ -29,7 +29,7 @@ export async function POST(req: Request) {
     // Otherwise, start new generation
     const {
       prompt,
-      negative_prompt = "worst quality, low quality, text, censored, deformed, bad hand, watermark, 3d, wrinkle, bad face, bad anatomy",
+      negative_prompt = "modern, recent, old, oldest, cartoon, graphic, text, painting, crayon, graphite, abstract, glitch, deformed, mutated, ugly, disfigured, long body, lowres, bad anatomy, bad hands, missing fingers, extra digits, fewer digits, cropped, very displeasing, (worst quality, bad quality:1.2), bad anatomy, sketch, jpeg artifacts, signature, watermark, username, signature, simple background, conjoined, bad ai-generated",
       height = 1024,
       width = 1024,
       num_inference_steps = 30,
@@ -41,7 +41,7 @@ export async function POST(req: Request) {
 
     const payload = {
       input: {
-        prompt: `masterpiece, high quality, ${prompt}`,
+        prompt: `masterpiece, best quality, amazing quality, very aesthetic, high resolution, ultra-detailed, absurdres, newest, scenery, ${prompt}, BREAK, depth of field, volumetric lighting`,
         negative_prompt,
         height,
         width,

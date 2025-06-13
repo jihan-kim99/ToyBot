@@ -1,12 +1,12 @@
-import React from 'react';
-import { 
-  Dialog, 
-  DialogTitle, 
-  DialogContent, 
-  DialogActions, 
-  Button, 
-  TextField
-} from '@mui/material';
+import React from "react";
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+  TextField,
+} from "@mui/material";
 
 interface PromptDialogProps {
   isOpen: boolean;
@@ -23,17 +23,26 @@ const PromptDialog: React.FC<PromptDialogProps> = ({
   onClose,
   onPromptChange,
   onGenerate,
-  isGenerating
+  isGenerating,
 }) => {
+  // Base prompt constants
+  const BASE_PROMPT =
+    "masterpiece, best quality, amazing quality, very aesthetic, high resolution, ultra-detailed, absurdres, newest, scenery";
+
+  const handleAddBasePrompt = () => {
+    const newPrompt = prompt ? `${BASE_PROMPT}, ${prompt}` : BASE_PROMPT;
+    onPromptChange(newPrompt);
+  };
+
   return (
-    <Dialog 
-      open={isOpen} 
+    <Dialog
+      open={isOpen}
       onClose={isGenerating ? undefined : onClose}
       fullWidth
       maxWidth="md"
     >
       <DialogTitle>Edit Image Generation Prompt</DialogTitle>
-      
+
       <DialogContent>
         <TextField
           fullWidth
@@ -46,19 +55,23 @@ const PromptDialog: React.FC<PromptDialogProps> = ({
           margin="normal"
         />
       </DialogContent>
-      
+
       <DialogActions>
-        <Button 
-          onClick={onClose}
+        <Button
+          onClick={handleAddBasePrompt}
           disabled={isGenerating}
-          color="inherit"
+          color="secondary"
+          variant="outlined"
         >
+          Add Base Prompt
+        </Button>
+        <Button onClick={onClose} disabled={isGenerating} color="inherit">
           Cancel
         </Button>
-        <Button 
+        <Button
           onClick={onGenerate}
           disabled={isGenerating}
-          color="primary" 
+          color="primary"
           variant="contained"
         >
           {isGenerating ? "Generating..." : "Generate Image"}

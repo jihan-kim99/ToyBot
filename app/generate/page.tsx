@@ -235,6 +235,22 @@ export default function GeneratePage() {
     updateHistory(newHistory);
   };
 
+  // Base prompt constants
+  const BASE_PROMPT =
+    "masterpiece, best quality, amazing quality, very aesthetic, high resolution, ultra-detailed, absurdres, newest, scenery";
+  const BASE_NEGATIVE_PROMPT =
+    "modern, recent, old, oldest, cartoon, graphic, text, painting, crayon, graphite, abstract, glitch, deformed, mutated, ugly, disfigured, long body, lowres, bad anatomy, bad hands, missing fingers, extra digits, fewer digits, cropped, very displeasing, (worst quality, bad quality:1.2), bad anatomy, sketch, jpeg artifacts, signature, watermark, username, signature, simple background, conjoined, bad ai-generated";
+
+  const handleAddBasePrompt = () => {
+    setParams((prev) => ({
+      ...prev,
+      prompt: prev.prompt ? `${BASE_PROMPT}, ${prev.prompt}` : BASE_PROMPT,
+      negative_prompt: prev.negative_prompt
+        ? `${BASE_NEGATIVE_PROMPT}, ${prev.negative_prompt}`
+        : BASE_NEGATIVE_PROMPT,
+    }));
+  };
+
   return (
     <Container maxWidth="xl" sx={{ py: 4 }}>
       <Grid container spacing={{ xs: 2, md: 3 }}>
@@ -247,8 +263,15 @@ export default function GeneratePage() {
               <Button variant="outlined" href="/" sx={{ mr: 2 }}>
                 back
               </Button>
-              <Button variant="outlined" onClick={() => setHistoryOpen(true)}>
+              <Button
+                variant="outlined"
+                onClick={() => setHistoryOpen(true)}
+                sx={{ mr: 2 }}
+              >
                 hist
+              </Button>
+              <Button variant="outlined" onClick={handleAddBasePrompt}>
+                base
               </Button>
             </Box>
             <Box component="form" onSubmit={handleSubmit} noValidate>

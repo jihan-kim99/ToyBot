@@ -193,14 +193,22 @@ export default function ChatInterface() {
       } else {
         console.error("Error generating prompt:", data.error);
         // Set fallback prompt when API fails
-        setImagePrompt("masterpiece,best quality,amazing quality,");
-        setImageNeg("bad quality,worst quality,worst detail,sketch,censor,");
+        setImagePrompt(
+          "masterpiece, best quality, amazing quality, very aesthetic, high resolution, ultra-detailed, absurdres, newest, scenery"
+        );
+        setImageNeg(
+          "modern, recent, old, oldest, cartoon, graphic, text, painting, crayon, graphite, abstract, glitch, deformed, mutated, ugly, disfigured, long body, lowres, bad anatomy, bad hands, missing fingers, extra digits, fewer digits, cropped, very displeasing, (worst quality, bad quality:1.2), bad anatomy, sketch, jpeg artifacts, signature, watermark, username, signature, simple background, conjoined, bad ai-generated"
+        );
       }
     } catch (error) {
       console.error("Error generating prompt:", error);
       // Set fallback prompt when request fails
-      setImagePrompt("masterpiece,best quality,amazing quality,");
-      setImageNeg("bad quality,worst quality,worst detail,sketch,censor,");
+      setImagePrompt(
+        "masterpiece, best quality, amazing quality, very aesthetic, high resolution, ultra-detailed, absurdres, newest, scenery"
+      );
+      setImageNeg(
+        "modern, recent, old, oldest, cartoon, graphic, text, painting, crayon, graphite, abstract, glitch, deformed, mutated, ugly, disfigured, long body, lowres, bad anatomy, bad hands, missing fingers, extra digits, fewer digits, cropped, very displeasing, (worst quality, bad quality:1.2), bad anatomy, sketch, jpeg artifacts, signature, watermark, username, signature, simple background, conjoined, bad ai-generated"
+      );
     } finally {
       // Always show the dialog regardless of success or failure
       setIsPromptDialogOpen(true);

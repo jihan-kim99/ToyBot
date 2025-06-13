@@ -72,6 +72,16 @@ export const CharacterSetting = ({
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const [chatHistories, setChatHistories] = useState<ChatHistory[]>([]);
 
+  // Base prompt constants
+  const BASE_PROMPT =
+    "masterpiece, best quality, amazing quality, very aesthetic, high resolution, ultra-detailed, absurdres, newest, scenery";
+
+  const handleAddBasePrompt = () => {
+    setCharaImagePrompt((prev) =>
+      prev ? `${BASE_PROMPT}, ${prev}` : BASE_PROMPT
+    );
+  };
+
   useEffect(() => {
     setSavedCharacters(getSavedCharacters());
   }, []);
@@ -168,7 +178,11 @@ export const CharacterSetting = ({
       setIsDragging(false);
 
       const file = e.dataTransfer.files[0];
-      if (!file || (!file.name.endsWith(".png") && !file.name.endsWith(".json"))) return;
+      if (
+        !file ||
+        (!file.name.endsWith(".png") && !file.name.endsWith(".json"))
+      )
+        return;
 
       const result = await decodeCharacterCard(file);
       if (result) {
@@ -342,6 +356,17 @@ export const CharacterSetting = ({
           }}
           sx={{ flex: 1 }}
         />
+        <Button
+          variant="outlined"
+          onClick={handleAddBasePrompt}
+          disabled={isGenerating}
+          sx={{
+            color: whatsappTheme.lightGreen,
+            borderColor: whatsappTheme.lightGreen,
+          }}
+        >
+          Base
+        </Button>
         <Button
           variant="contained"
           onClick={handleGenerateImage}
