@@ -192,7 +192,6 @@ export default function ChatInterface() {
         setImageNeg(data.negative_prompt);
       } else {
         console.error("Error generating prompt:", data.error);
-        // Set fallback prompt when API fails
         setImagePrompt(
           "masterpiece, best quality, amazing quality, very aesthetic, high resolution, ultra-detailed, absurdres, newest, scenery"
         );

@@ -57,8 +57,10 @@ export const CharacterSetting = ({
   setMessages,
 }: CharacterSettingProps) => {
   const [charaImagePrompt, setCharaImagePrompt] = useState(charaAppearance);
+  const [charaImageNegPrompt, setCharaImageNegPrompt] = useState("");
   const [isDragging, setIsDragging] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isImageGenOpen, setIsImageGenOpen] = useState(false);
 
   const [characterData, setCharacterData] =
     useState<CharacterData>(systemPrompt);
@@ -75,10 +77,15 @@ export const CharacterSetting = ({
   // Base prompt constants
   const BASE_PROMPT =
     "masterpiece, best quality, amazing quality, very aesthetic, high resolution, ultra-detailed, absurdres, newest, scenery";
+  const BASE_NEGATIVE_PROMPT =
+    "modern, recent, old, oldest, cartoon, graphic, text, painting, crayon, graphite, abstract, glitch, deformed, mutated, ugly, disfigured, long body, lowres, bad anatomy, bad hands, missing fingers, extra digits, fewer digits, cropped, very displeasing, (worst quality, bad quality:1.2), bad anatomy, sketch, jpeg artifacts, signature, watermark, username, signature, simple background, conjoined, bad ai-generated";
 
   const handleAddBasePrompt = () => {
     setCharaImagePrompt((prev) =>
       prev ? `${BASE_PROMPT}, ${prev}` : BASE_PROMPT
+    );
+    setCharaImageNegPrompt((prev) =>
+      prev ? `${BASE_NEGATIVE_PROMPT}, ${prev}` : BASE_NEGATIVE_PROMPT
     );
   };
 
@@ -153,6 +160,7 @@ export const CharacterSetting = ({
     try {
       const imageUrl = await generateImage({
         prompt: charaImagePrompt,
+        negative_prompt: charaImageNegPrompt || undefined,
       });
       if (imageUrl) setCharaImage(imageUrl);
     } catch (error) {
@@ -345,41 +353,83 @@ export const CharacterSetting = ({
         </Box>
       )}
 
-      {/* Image generation section */}
-      <Box sx={{ display: "flex", gap: 2, mb: 2 }}>
-        <StyledTextField
-          label="Image Prompt"
-          value={charaImagePrompt}
-          onChange={(e) => setCharaImagePrompt(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") handleGenerateImage();
-          }}
-          sx={{ flex: 1 }}
-        />
-        <Button
-          variant="outlined"
-          onClick={handleAddBasePrompt}
-          disabled={isGenerating}
-          sx={{
-            color: whatsappTheme.lightGreen,
-            borderColor: whatsappTheme.lightGreen,
-          }}
-        >
-          Base
-        </Button>
-        <Button
-          variant="contained"
-          onClick={handleGenerateImage}
-          disabled={!charaImagePrompt || isGenerating}
-          sx={{ backgroundColor: whatsappTheme.lightGreen }}
-        >
-          Generate Image
-        </Button>
-        {
-          <Typography variant="caption" sx={{ alignSelf: "center" }}>
-            {isGenerating ? "Generating..." : ""}
-          </Typography>
-        }
+      {/* Enhanced Image generation section */}
+      <Box sx={{ mb: 2 }}>
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+          <Typography variant="subtitle1">Image Generation</Typography>
+          <IconButton
+            onClick={() => setIsImageGenOpen(!isImageGenOpen)}
+            sx={{ color: whatsappTheme.lightGreen }}
+          >
+            {isImageGenOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+          </IconButton>
+        </Box>
+        <Collapse in={isImageGenOpen}>
+          <Box
+            sx={{
+              mt: 2,
+              p: 2,
+              backgroundColor: whatsappTheme.chatBackground,
+              borderRadius: 2,
+            }}
+          >
+            <StyledTextField
+              label="Prompt"
+              value={charaImagePrompt}
+              onChange={(e) => setCharaImagePrompt(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && e.ctrlKey) {
+                  e.preventDefault();
+                  handleGenerateImage();
+                }
+              }}
+              multiline
+              minRows={2}
+              maxRows={4}
+              sx={{ mb: 2 }}
+            />
+            <StyledTextField
+              label="Negative Prompt"
+              value={charaImageNegPrompt}
+              onChange={(e) => setCharaImageNegPrompt(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && e.ctrlKey) {
+                  e.preventDefault();
+                  handleGenerateImage();
+                }
+              }}
+              multiline
+              minRows={2}
+              maxRows={4}
+              sx={{ mb: 2 }}
+            />
+            <Box sx={{ display: "flex", gap: 2, mb: 2 }}>
+              <Button
+                variant="outlined"
+                onClick={handleAddBasePrompt}
+                disabled={isGenerating}
+                sx={{
+                  color: whatsappTheme.lightGreen,
+                  borderColor: whatsappTheme.lightGreen,
+                }}
+              >
+                Add Base Prompts
+              </Button>
+              <Button
+                variant="contained"
+                onClick={handleGenerateImage}
+                disabled={!charaImagePrompt || isGenerating}
+                sx={{ backgroundColor: whatsappTheme.lightGreen }}
+              >
+                {isGenerating ? "Generating..." : "Generate Image"}
+              </Button>
+            </Box>
+            <Typography variant="caption" color="text.secondary">
+              Press Ctrl+Enter in prompt fields to generate • Base prompts add
+              quality tags
+            </Typography>
+          </Box>
+        </Collapse>
       </Box>
 
       {charaImage && (

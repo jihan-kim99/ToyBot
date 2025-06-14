@@ -263,15 +263,8 @@ export default function GeneratePage() {
               <Button variant="outlined" href="/" sx={{ mr: 2 }}>
                 back
               </Button>
-              <Button
-                variant="outlined"
-                onClick={() => setHistoryOpen(true)}
-                sx={{ mr: 2 }}
-              >
+              <Button variant="outlined" onClick={() => setHistoryOpen(true)}>
                 hist
-              </Button>
-              <Button variant="outlined" onClick={handleAddBasePrompt}>
-                base
               </Button>
             </Box>
             <Box component="form" onSubmit={handleSubmit} noValidate>
@@ -288,6 +281,14 @@ export default function GeneratePage() {
                     }
                     onKeyDown={(e) => handleWeightAdjustment(e, "prompt")}
                   />
+                </Grid>
+                <Grid
+                  size={12}
+                  sx={{ display: "flex", justifyContent: "center" }}
+                >
+                  <Button variant="outlined" onClick={handleAddBasePrompt}>
+                    Base
+                  </Button>
                 </Grid>
                 <Grid size={12}>
                   <TextField

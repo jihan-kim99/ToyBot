@@ -41,7 +41,7 @@ export async function POST(req: Request) {
 
     const payload = {
       input: {
-        prompt: `masterpiece, best quality, amazing quality, very aesthetic, high resolution, ultra-detailed, absurdres, newest, scenery, ${prompt}, BREAK, depth of field, volumetric lighting`,
+        prompt,
         negative_prompt,
         height,
         width,
