@@ -34,16 +34,18 @@ const Item = styled(Paper)(({ theme }) => ({
   height: "100%",
 }));
 
+const defaultParams = {
+  prompt: "",
+  negative_prompt: "",
+  height: 1360,
+  width: 840,
+  num_inference_steps: 30,
+  guidance_scale: 6,
+  scheduler: SchedulerType.DPMSolverMultistepKarras,
+};
+
 export default function GeneratePage() {
-  const [params, setParams] = useState({
-    prompt: "",
-    negative_prompt: "",
-    height: 1360,
-    width: 1024,
-    num_inference_steps: 20,
-    guidance_scale: 6,
-    scheduler: SchedulerType.EULER_A,
-  });
+  const [params, setParams] = useState(defaultParams);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);

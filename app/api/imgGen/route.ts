@@ -30,13 +30,13 @@ export async function POST(req: Request) {
     const {
       prompt,
       negative_prompt = "modern, recent, old, oldest, cartoon, graphic, text, painting, crayon, graphite, abstract, glitch, deformed, mutated, ugly, disfigured, long body, lowres, bad anatomy, bad hands, missing fingers, extra digits, fewer digits, cropped, very displeasing, (worst quality, bad quality:1.2), bad anatomy, sketch, jpeg artifacts, signature, watermark, username, signature, simple background, conjoined, bad ai-generated",
-      height = 1024,
-      width = 1024,
+      height = 1360,
+      width = 840,
       num_inference_steps = 30,
-      guidance_scale = 7.5,
+      guidance_scale = 6,
       num_images = 1,
       seed = Math.floor(Math.random() * 65535),
-      scheduler = SchedulerType.EULER_A,
+      scheduler = SchedulerType.DPMSolverMultistepKarras,
     } = params;
 
     const payload = {

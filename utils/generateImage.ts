@@ -23,7 +23,7 @@ export const generateImage = async (params: GenerationParams) => {
       body: JSON.stringify({
         ...params,
         height: params.height || 1360,
-        width: params.width || 1024,
+        width: params.width || 840,
         num_inference_steps: params.num_inference_steps || 20,
         guidance_scale: params.guidance_scale || 5,
         num_images: params.num_images || 1,
