@@ -22,9 +22,9 @@ export const generateImage = async (params: GenerationParams) => {
       },
       body: JSON.stringify({
         ...params,
-        height: params.height || 1360,
-        width: params.width || 840,
-        num_inference_steps: params.num_inference_steps || 20,
+        height: params.height || 1440,
+        width: params.width || 960,
+        num_inference_steps: params.num_inference_steps || 30,
         guidance_scale: params.guidance_scale || 5,
         num_images: params.num_images || 1,
         seed: params.seed || Math.floor(Math.random() * 2147483647),

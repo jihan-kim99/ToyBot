@@ -37,8 +37,8 @@ const Item = styled(Paper)(({ theme }) => ({
 const defaultParams = {
   prompt: "",
   negative_prompt: "",
-  height: 1360,
-  width: 840,
+  height: 1440,
+  width: 960,
   num_inference_steps: 30,
   guidance_scale: 6,
   scheduler: SchedulerType.DPMSolverMultistepKarras,
