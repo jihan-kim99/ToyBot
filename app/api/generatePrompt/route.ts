@@ -98,12 +98,12 @@ export async function POST(req: Request) {
 
     // const ponyBasePrompt = "score_7_up, score_8_up, score_9,";
     const ilBasePrompt =
-      "masterpiece, best quality, amazing quality, very aesthetic, high resolution, ultra-detailed, absurdres, newest, scenery";
+      "(detailed skin texture), 4k, highly detailed, masterpiece, ";
     // const ponyNeg = "score_6, score_5, score_4, jpeg artifacts, compression artifacts, blurry, noise, scanlines, distortion, chromatic aberration, vignette, extra fingers, extra limbs, missing fingers, missing limbs, bad anatomy, extra toes, deformed fingers, deformed legs, bad foots, melting fingers, melting toes, long body, asymmetric composition, rough edges, pixelation, glitch, error, watermarks, signatures, text, UI elements, overlays, camera frame, borders, low quality, distortion, blurry background, artifacts, random text, low detail, misspelled text, excessive noise";
     const ilNeg =
-      "modern, recent, old, oldest, cartoon, graphic, text, painting, crayon, graphite, abstract, glitch, deformed, mutated, ugly, disfigured, long body, lowres, bad anatomy, bad hands, missing fingers, extra digits, fewer digits, cropped, very displeasing, (worst quality, bad quality:1.2), bad anatomy, sketch, jpeg artifacts, signature, watermark, username, signature, simple background, conjoined, bad ai-generated";
+      "bad quality,worst quality,worst detail,sketch,text,words,3d,";
 
-    const fullPrompt = `${ilBasePrompt}, ${promptContext}, BREAK, depth of field, volumetric lighting`;
+    const fullPrompt = `${ilBasePrompt}, ${promptContext}`;
     const negative_prompt = ilNeg;
     console.log("Generated prompt:", fullPrompt);
 

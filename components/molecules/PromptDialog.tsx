@@ -27,7 +27,7 @@ const PromptDialog: React.FC<PromptDialogProps> = ({
 }) => {
   // Base prompt constants
   const BASE_PROMPT =
-    "masterpiece, best quality, amazing quality, very aesthetic, high resolution, ultra-detailed, absurdres, newest, scenery";
+    "(detailed skin texture), 4k, highly detailed, masterpiece";
 
   const handleAddBasePrompt = () => {
     const newPrompt = prompt ? `${BASE_PROMPT}, ${prompt}` : BASE_PROMPT;
