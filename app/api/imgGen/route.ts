@@ -29,14 +29,14 @@ export async function POST(req: Request) {
     // Otherwise, start new generation
     const {
       prompt,
-      negative_prompt = "modern, recent, old, oldest, cartoon, graphic, text, painting, crayon, graphite, abstract, glitch, deformed, mutated, ugly, disfigured, long body, lowres, bad anatomy, bad hands, missing fingers, extra digits, fewer digits, cropped, very displeasing, (worst quality, bad quality:1.2), bad anatomy, sketch, jpeg artifacts, signature, watermark, username, signature, simple background, conjoined, bad ai-generated",
-      height = 1440,
-      width = 960,
-      num_inference_steps = 30,
-      guidance_scale = 6,
+      negative_prompt = "bad quality,worst quality,worst detail,sketch,text,words,3d,",
+      height = 1152,
+      width = 896,
+      num_inference_steps = 20,
+      guidance_scale = 4,
       num_images = 1,
       seed = Math.floor(Math.random() * 65535),
-      scheduler = SchedulerType.DPMSolverMultistepKarras,
+      scheduler = SchedulerType.DPMSolverSDEKarras,
     } = params;
 
     const payload = {

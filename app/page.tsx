@@ -193,7 +193,7 @@ export default function ChatInterface() {
       } else {
         console.error("Error generating prompt:", data.error);
         setImagePrompt(
-          "(detailed skin texture), 4k, highly detailed, masterpiece, "
+          "masterpiece, ultra-HD, photorealistic, high detail, best quality, 8k, best quality, sharp focus, ray-tracing, realistic, depth of field, shallow depth of field, raw photo "
         );
         setImageNeg(
           "bad quality,worst quality,worst detail,sketch,text,words,3d,"
@@ -203,7 +203,7 @@ export default function ChatInterface() {
       console.error("Error generating prompt:", error);
       // Set fallback prompt when request fails
       setImagePrompt(
-        "(detailed skin texture), 4k, highly detailed, masterpiece, "
+        "masterpiece, ultra-HD, photorealistic, high detail, best quality, 8k, best quality, sharp focus, ray-tracing, realistic, depth of field, shallow depth of field, raw photo "
       );
       setImageNeg(
         "bad quality,worst quality,worst detail,sketch,text,words,3d,"

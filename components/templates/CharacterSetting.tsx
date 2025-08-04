@@ -76,7 +76,7 @@ export const CharacterSetting = ({
 
   // Base prompt constants
   const BASE_PROMPT =
-    "(detailed skin texture), 4k, highly detailed, masterpiece, ";
+    "masterpiece, ultra-HD, photorealistic, high detail, best quality, 8k, best quality, sharp focus, ray-tracing, realistic, depth of field, shallow depth of field, raw photo ";
   const BASE_NEGATIVE_PROMPT =
     "bad quality,worst quality,worst detail,sketch,text,words,3d,";
 
