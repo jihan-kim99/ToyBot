@@ -15,6 +15,14 @@ interface GenerationParams {
 
 export const generateImage = async (params: GenerationParams) => {
   try {
+    const roundUpHeight =
+      8 -
+      ((params.height || defaultParams.height) % 8) +
+      (params.height || defaultParams.height);
+    const roundUpWidth =
+      8 -
+      ((params.width || defaultParams.width) % 8) +
+      (params.width || defaultParams.width);
     // Initial generation request
     const result = await fetch("/api/imgGen", {
       method: "POST",
@@ -23,8 +31,8 @@ export const generateImage = async (params: GenerationParams) => {
       },
       body: JSON.stringify({
         ...params,
-        height: params.height || defaultParams.height,
-        width: params.width || defaultParams.width,
+        height: roundUpHeight,
+        width: roundUpWidth,
         num_inference_steps:
           params.num_inference_steps || defaultParams.num_inference_steps,
         guidance_scale: params.guidance_scale || defaultParams.guidance_scale,
