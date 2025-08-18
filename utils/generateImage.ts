@@ -1,4 +1,5 @@
 import { SchedulerType } from "./schedulerTypes";
+import { defaultParams } from "./defaultSetting";
 
 interface GenerationParams {
   prompt: string;
@@ -22,13 +23,14 @@ export const generateImage = async (params: GenerationParams) => {
       },
       body: JSON.stringify({
         ...params,
-        height: params.height || 1440,
-        width: params.width || 960,
-        num_inference_steps: params.num_inference_steps || 30,
-        guidance_scale: params.guidance_scale || 5,
+        height: params.height || defaultParams.height,
+        width: params.width || defaultParams.width,
+        num_inference_steps:
+          params.num_inference_steps || defaultParams.num_inference_steps,
+        guidance_scale: params.guidance_scale || defaultParams.guidance_scale,
         num_images: params.num_images || 1,
         seed: params.seed || Math.floor(Math.random() * 2147483647),
-        scheduler: params.scheduler || SchedulerType.EULER_A,
+        scheduler: params.scheduler || defaultParams.scheduler,
       }),
     });
 

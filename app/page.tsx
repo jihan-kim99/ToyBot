@@ -5,6 +5,7 @@ import { ChatTemplate } from "@/components/templates/ChatTemplate";
 import { CharacterSetting } from "@/components/templates/CharacterSetting";
 import PromptDialog from "@/components/molecules/PromptDialog";
 import { generateImage } from "@/utils/generateImage";
+import { BASE_PROMPT, BASE_NEGATIVE_PROMPT } from "@/utils/defaultSetting";
 import {
   initDB,
   saveChatHistory,
@@ -192,22 +193,14 @@ export default function ChatInterface() {
         setImageNeg(data.negative_prompt);
       } else {
         console.error("Error generating prompt:", data.error);
-        setImagePrompt(
-          "masterpiece, ultra-HD, photorealistic, high detail, best quality, 8k, best quality, sharp focus, ray-tracing, realistic, depth of field, shallow depth of field, raw photo "
-        );
-        setImageNeg(
-          "bad quality,worst quality,worst detail,sketch,text,words,3d,"
-        );
+        setImagePrompt(BASE_PROMPT);
+        setImageNeg(BASE_NEGATIVE_PROMPT);
       }
     } catch (error) {
       console.error("Error generating prompt:", error);
       // Set fallback prompt when request fails
-      setImagePrompt(
-        "masterpiece, ultra-HD, photorealistic, high detail, best quality, 8k, best quality, sharp focus, ray-tracing, realistic, depth of field, shallow depth of field, raw photo "
-      );
-      setImageNeg(
-        "bad quality,worst quality,worst detail,sketch,text,words,3d,"
-      );
+      setImagePrompt(BASE_PROMPT);
+      setImageNeg(BASE_NEGATIVE_PROMPT);
     } finally {
       // Always show the dialog regardless of success or failure
       setIsPromptDialogOpen(true);

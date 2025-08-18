@@ -36,6 +36,7 @@ import { CardCarousel } from "../molecules/CardCarousel";
 import { ChatHistory, getCharacterChatHistories } from "@/utils/indexedDB";
 import { ChatHistorySlider } from "../molecules/ChatHistorySlider";
 import HistoryIcon from "@mui/icons-material/History";
+import { BASE_PROMPT, BASE_NEGATIVE_PROMPT } from "@/utils/defaultSetting";
 
 interface CharacterSettingProps {
   charaImage: string;
@@ -73,12 +74,6 @@ export const CharacterSetting = ({
   const [isCarouselOpen, setIsCarouselOpen] = useState(false);
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const [chatHistories, setChatHistories] = useState<ChatHistory[]>([]);
-
-  // Base prompt constants
-  const BASE_PROMPT =
-    "masterpiece, ultra-HD, photorealistic, high detail, best quality, 8k, best quality, sharp focus, ray-tracing, realistic, depth of field, shallow depth of field, raw photo ";
-  const BASE_NEGATIVE_PROMPT =
-    "bad quality,worst quality,worst detail,sketch,text,words,3d,";
 
   const handleAddBasePrompt = () => {
     setCharaImagePrompt((prev) =>

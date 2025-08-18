@@ -5,6 +5,7 @@ import {
   HarmCategory,
 } from "@google/generative-ai";
 import { Message } from "@/types/chat";
+import { BASE_PROMPT, BASE_NEGATIVE_PROMPT } from "@/utils/defaultSetting";
 
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY || "");
 
@@ -97,11 +98,9 @@ export async function POST(req: Request) {
     );
 
     // const ponyBasePrompt = "score_7_up, score_8_up, score_9,";
-    const ilBasePrompt =
-      "masterpiece, ultra-HD, photorealistic, high detail, best quality, 8k, best quality, sharp focus, ray-tracing, realistic, depth of field, shallow depth of field, raw photo ";
+    const ilBasePrompt = BASE_PROMPT;
     // const ponyNeg = "score_6, score_5, score_4, jpeg artifacts, compression artifacts, blurry, noise, scanlines, distortion, chromatic aberration, vignette, extra fingers, extra limbs, missing fingers, missing limbs, bad anatomy, extra toes, deformed fingers, deformed legs, bad foots, melting fingers, melting toes, long body, asymmetric composition, rough edges, pixelation, glitch, error, watermarks, signatures, text, UI elements, overlays, camera frame, borders, low quality, distortion, blurry background, artifacts, random text, low detail, misspelled text, excessive noise";
-    const ilNeg =
-      "bad quality,worst quality,worst detail,sketch,text,words,3d,";
+    const ilNeg = BASE_NEGATIVE_PROMPT;
 
     const fullPrompt = `${ilBasePrompt}, ${promptContext}`;
     const negative_prompt = ilNeg;

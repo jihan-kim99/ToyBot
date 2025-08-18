@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { SchedulerType } from "@/utils/schedulerTypes";
 import { RunPodInput } from "@/types/api";
+import { defaultParams } from "@/utils/defaultSetting";
 
 const API_KEY = process.env.RUNPOD_API_KEY;
 const ENDPOINT = `${process.env.RUNPOD_API_ENDPOINT}/run`;
@@ -29,14 +29,14 @@ export async function POST(req: Request) {
     // Otherwise, start new generation
     const {
       prompt,
-      negative_prompt = "bad quality,worst quality,worst detail,sketch,text,words,3d,",
-      height = 1152,
-      width = 896,
-      num_inference_steps = 20,
-      guidance_scale = 4,
+      negative_prompt = defaultParams.negative_prompt,
+      height = defaultParams.height,
+      width = defaultParams.width,
+      num_inference_steps = defaultParams.num_inference_steps,
+      guidance_scale = defaultParams.guidance_scale,
       num_images = 1,
       seed = Math.floor(Math.random() * 65535),
-      scheduler = SchedulerType.DPMSolverSDEKarras,
+      scheduler = defaultParams.scheduler,
     } = params;
 
     const payload = {

@@ -3,6 +3,11 @@
 import { useState, useEffect } from "react";
 import { generateImage } from "@/utils/generateImage";
 import { SchedulerType, getSchedulerTypes } from "@/utils/schedulerTypes";
+import {
+  defaultParams,
+  BASE_PROMPT,
+  BASE_NEGATIVE_PROMPT,
+} from "@/utils/defaultSetting";
 import { useImageViewer } from "react-image-viewer-hook";
 import { styled } from "@mui/material/styles";
 import {
@@ -34,18 +39,18 @@ const Item = styled(Paper)(({ theme }) => ({
   height: "100%",
 }));
 
-const defaultParams = {
-  prompt: "",
-  negative_prompt: "",
-  height: 1152,
-  width: 896,
-  num_inference_steps: 20,
-  guidance_scale: 4,
-  scheduler: SchedulerType.DPMSolverSDEKarras,
+const initialParams = {
+  prompt: defaultParams.prompt,
+  negative_prompt: defaultParams.negative_prompt,
+  height: defaultParams.height,
+  width: defaultParams.width,
+  num_inference_steps: defaultParams.num_inference_steps,
+  guidance_scale: defaultParams.guidance_scale,
+  scheduler: defaultParams.scheduler,
 };
 
 export default function GeneratePage() {
-  const [params, setParams] = useState(defaultParams);
+  const [params, setParams] = useState(initialParams);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);
@@ -236,12 +241,6 @@ export default function GeneratePage() {
     const newHistory = promptHistory.filter((item) => item.id !== id);
     updateHistory(newHistory);
   };
-
-  // Base prompt constants
-  const BASE_PROMPT =
-    "masterpiece, ultra-HD, photorealistic, high detail, best quality, 8k, best quality, sharp focus, ray-tracing, realistic, depth of field, shallow depth of field, raw photo ";
-  const BASE_NEGATIVE_PROMPT =
-    "bad quality,worst quality,worst detail,sketch,text,words,3d,";
 
   const handleAddBasePrompt = () => {
     setParams((prev) => ({
