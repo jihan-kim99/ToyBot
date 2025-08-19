@@ -29,13 +29,15 @@ import {
   deleteCharacter,
   isCharacterEqual,
 } from "@/utils/localStorageUtils";
+import HistoryIcon from "@mui/icons-material/History";
+import ImageIcon from "@mui/icons-material/Image";
+
 import { CharacterForm } from "../molecules/CharacterForm";
 import { StyledTextField } from "../atoms/StyledTextField";
 import { whatsappTheme } from "@/theme/whatsapp";
 import { CardCarousel } from "../molecules/CardCarousel";
 import { ChatHistory, getCharacterChatHistories } from "@/utils/indexedDB";
 import { ChatHistorySlider } from "../molecules/ChatHistorySlider";
-import HistoryIcon from "@mui/icons-material/History";
 import { BASE_PROMPT, BASE_NEGATIVE_PROMPT } from "@/utils/defaultSetting";
 
 interface CharacterSettingProps {
@@ -221,9 +223,22 @@ export const CharacterSetting = ({
           alignItems: "center",
         }}
       >
-        <Typography variant="h5" sx={{ color: "white" }}>
+        {/* <Typography variant="h5" sx={{ color: "white" }}>
           Setting
         </Typography>
+        <Button
+          variant="contained"
+          href="/generate"
+          sx={{ backgroundColor: whatsappTheme.lightGreen }}
+        >
+          Generate Image only
+        </Button> */}
+        <a href="/generate">
+          <IconButton sx={{ color: "white" }}>
+            <ImageIcon />
+          </IconButton>
+        </a>
+
         <Box sx={{ display: "flex", gap: 2 }}>
           <IconButton
             onClick={() => setIsHistoryOpen(true)}
@@ -460,13 +475,6 @@ export const CharacterSetting = ({
         onFieldChange={handleInputChange}
       />
       <Box sx={{ mt: 3, display: "flex", justifyContent: "flex-end", gap: 2 }}>
-        <Button
-          variant="contained"
-          href="/generate"
-          sx={{ backgroundColor: whatsappTheme.lightGreen }}
-        >
-          Generate Image only
-        </Button>
         <Button
           variant="contained"
           onClick={handleSaveCharacter}
