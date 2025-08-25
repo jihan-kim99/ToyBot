@@ -23,6 +23,8 @@ export async function POST(req: Request) {
         imageUrl:
           status.status === "COMPLETED" ? status.output?.image_url : null,
         error: status.error,
+        delayTime: status.delayTime,
+        executionTime: status.executionTime,
       });
     }
 

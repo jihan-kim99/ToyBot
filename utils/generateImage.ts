@@ -13,7 +13,18 @@ interface GenerationParams {
   scheduler?: SchedulerType;
 }
 
-export const generateImage = async (params: GenerationParams) => {
+interface GenerationStatus {
+  status: string;
+  delayTime?: number;
+  executionTime?: number;
+  imageUrl?: string;
+  error?: string;
+}
+
+export const generateImage = async (
+  params: GenerationParams,
+  onStatusUpdate?: (status: GenerationStatus) => void
+) => {
   try {
     const roundUpHeight =
       8 -
@@ -58,6 +69,10 @@ export const generateImage = async (params: GenerationParams) => {
       });
 
       const statusData = await statusResult.json();
+
+      if (onStatusUpdate) {
+        onStatusUpdate(statusData);
+      }
 
       if (statusData.status === "COMPLETED" && statusData.imageUrl) {
         return statusData.imageUrl;

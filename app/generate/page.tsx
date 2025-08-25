@@ -49,6 +49,14 @@ const initialParams = {
   scheduler: defaultParams.scheduler,
 };
 
+interface GenerationStatus {
+  status: string;
+  delayTime?: number;
+  executionTime?: number;
+  imageUrl?: string;
+  error?: string;
+}
+
 export default function GeneratePage() {
   const [params, setParams] = useState(initialParams);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
@@ -63,6 +71,7 @@ export default function GeneratePage() {
     }>
   >([]);
   const [isGalleryView, setIsGalleryView] = useState(false);
+  const [waitTimeMessage, setWaitTimeMessage] = useState("");
 
   // Load history from localStorage on component mount
   useEffect(() => {
@@ -110,11 +119,22 @@ export default function GeneratePage() {
     }
   };
 
+  const handleStatusUpdate = (status: GenerationStatus) => {
+    if (status.delayTime && status.executionTime) {
+      const message = `Queue: ${Math.round(
+        status.delayTime / 1000
+      )}s, Gen: ${Math.round(status.executionTime / 1000)}s`;
+      setWaitTimeMessage(message);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    const url = await generateImage(params);
+    setWaitTimeMessage("");
+    const url = await generateImage(params, handleStatusUpdate);
     setImageUrl(url);
+    setWaitTimeMessage("");
 
     // Process image before saving to history
     const processedUrl = await processImageForStorage(url);
@@ -394,6 +414,16 @@ export default function GeneratePage() {
                   </TextField>
                 </Grid>
                 <Grid size={12}>
+                  {waitTimeMessage && (
+                    <Typography
+                      variant="caption"
+                      display="block"
+                      gutterBottom
+                      align="center"
+                    >
+                      {waitTimeMessage}
+                    </Typography>
+                  )}
                   <Button
                     fullWidth
                     type="submit"
