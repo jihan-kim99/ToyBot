@@ -237,10 +237,10 @@ export default function ChatInterface() {
   };
 
   const handleRestart = () => {
-    // Replace {{char}} with character name and {{user}} with "SEXIET" in first message
+    // Replace {{char}} with character name and {{user}} with "SEXIET" in first message (case-insensitive)
     const processedFirstMes = (systemPrompt.first_mes || "Hello!")
-      .replace(/\{\{char\}\}/g, systemPrompt.name || "")
-      .replace(/\{\{user\}\}/g, "SEXIET");
+      .replace(/\{\{char\}\}/gi, systemPrompt.name || "")
+      .replace(/\{\{user\}\}/gi, "SEXIET");
 
     setMessages([
       {

@@ -51,21 +51,21 @@ export async function POST(request: Request) {
     ];
 
     if (systemPrompt) {
-      // Replace {{char}} with character name and {{user}} with "SEXIET"
+      // Replace {{char}} with character name and {{user}} with "SEXIET" (case-insensitive)
       const processedDescription =
         systemPrompt.description
-          ?.replace(/\{\{char\}\}/g, systemPrompt.name)
-          ?.replace(/\{\{user\}\}/g, "SEXIET") || "";
+          ?.replace(/\{\{char\}\}/gi, systemPrompt.name)
+          ?.replace(/\{\{user\}\}/gi, "SEXIET") || "";
 
       const processedMesExample =
         systemPrompt.mes_example
-          ?.replace(/\{\{char\}\}/g, systemPrompt.name)
-          ?.replace(/\{\{user\}\}/g, "SEXIET") || "";
+          ?.replace(/\{\{char\}\}/gi, systemPrompt.name)
+          ?.replace(/\{\{user\}\}/gi, "SEXIET") || "";
 
       const processedScenario =
         systemPrompt.scenario
-          ?.replace(/\{\{char\}\}/g, systemPrompt.name)
-          ?.replace(/\{\{user\}\}/g, "SEXIET") || "";
+          ?.replace(/\{\{char\}\}/gi, systemPrompt.name)
+          ?.replace(/\{\{user\}\}/gi, "SEXIET") || "";
 
       formattedHistory.unshift({
         role: "user",
