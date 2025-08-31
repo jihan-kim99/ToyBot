@@ -121,9 +121,17 @@ export const CharacterSetting = ({
 
   const handleSaveCharacter = async () => {
     setSystemPrompt(characterData);
+
+    // Replace {{char}} with character name and {{user}} with "SEXIET" in first message
+    const processedFirstMes = (
+      characterData.first_mes || "Hello! How can I help you today?"
+    )
+      .replace(/\{\{char\}\}/g, characterData.name || "")
+      .replace(/\{\{user\}\}/g, "SEXIET");
+
     const firstMessage: Message = {
       id: Date.now(),
-      text: characterData.first_mes || "Hello! How can I help you today?",
+      text: processedFirstMes,
       sender: "bot",
       timestamp: new Date(),
     };

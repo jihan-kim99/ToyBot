@@ -237,10 +237,15 @@ export default function ChatInterface() {
   };
 
   const handleRestart = () => {
+    // Replace {{char}} with character name and {{user}} with "SEXIET" in first message
+    const processedFirstMes = (systemPrompt.first_mes || "Hello!")
+      .replace(/\{\{char\}\}/g, systemPrompt.name || "")
+      .replace(/\{\{user\}\}/g, "SEXIET");
+
     setMessages([
       {
         id: Date.now(),
-        text: systemPrompt.first_mes || "Hello!",
+        text: processedFirstMes,
         sender: "bot",
         timestamp: new Date(),
       },
