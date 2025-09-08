@@ -1,18 +1,34 @@
 import { NextResponse } from "next/server";
-import { RunPodInput } from "@/types/api";
+import { RunPodInput, ImageStyle } from "@/types/api";
 import { defaultParams } from "@/utils/defaultSetting";
 
 const API_KEY = process.env.RUNPOD_API_KEY;
-const ENDPOINT = `${process.env.RUNPOD_API_ENDPOINT}/run`;
-const STATUS_ENDPOINT = `${process.env.RUNPOD_API_ENDPOINT}/status/`;
+const REALISTIC_ENDPOINT = `${process.env.RUNPOD_API_ENDPOINT}/run`;
+const ANIME_ENDPOINT = `${process.env.RUNPOD_ANIME_ENDPOINT}/run`;
+const REALISTIC_STATUS_ENDPOINT = `${process.env.RUNPOD_API_ENDPOINT}/status/`;
+const ANIME_STATUS_ENDPOINT = `${process.env.RUNPOD_ANIME_ENDPOINT}/status/`;
+
+const getEndpoints = (style: ImageStyle = "realistic") => {
+  if (style === "anime") {
+    return {
+      runEndpoint: ANIME_ENDPOINT,
+      statusEndpoint: ANIME_STATUS_ENDPOINT,
+    };
+  }
+  return {
+    runEndpoint: REALISTIC_ENDPOINT,
+    statusEndpoint: REALISTIC_STATUS_ENDPOINT,
+  };
+};
 
 export async function POST(req: Request) {
   try {
-    const { id, ...params } = await req.json();
+    const { id, style, ...params } = await req.json();
 
     // If id is provided, check status
     if (id) {
-      const response = await fetch(`${STATUS_ENDPOINT}${id}`, {
+      const { statusEndpoint } = getEndpoints(style);
+      const response = await fetch(`${statusEndpoint}${id}`, {
         headers: { Authorization: `Bearer ${API_KEY}` },
       });
       const status = await response.json();
@@ -39,6 +55,8 @@ export async function POST(req: Request) {
       scheduler = defaultParams.scheduler,
     } = params;
 
+    const { runEndpoint } = getEndpoints(style);
+
     const payload = {
       input: {
         prompt,
@@ -53,7 +71,7 @@ export async function POST(req: Request) {
       } satisfies RunPodInput,
     };
 
-    const response = await fetch(ENDPOINT, {
+    const response = await fetch(runEndpoint, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${API_KEY}`,
@@ -70,6 +88,7 @@ export async function POST(req: Request) {
     return NextResponse.json({
       success: true,
       id: result.id,
+      style, // Return style so the client knows which endpoint was used
     });
   } catch (error) {
     console.error("Error:", error);

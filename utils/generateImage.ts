@@ -1,5 +1,6 @@
 import { SchedulerType } from "./schedulerTypes";
 import { defaultParams } from "./defaultSetting";
+import { ImageStyle } from "@/types/api";
 
 interface GenerationParams {
   prompt: string;
@@ -11,6 +12,7 @@ interface GenerationParams {
   num_images?: number;
   seed?: number;
   scheduler?: SchedulerType;
+  style?: ImageStyle;
 }
 
 export const generateImage = async (params: GenerationParams) => {
@@ -39,6 +41,7 @@ export const generateImage = async (params: GenerationParams) => {
         num_images: params.num_images || 1,
         seed: params.seed || Math.floor(Math.random() * 2147483647),
         scheduler: params.scheduler || defaultParams.scheduler,
+        style: params.style || "realistic",
       }),
     });
 
@@ -54,7 +57,10 @@ export const generateImage = async (params: GenerationParams) => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ id: data.id }),
+        body: JSON.stringify({
+          id: data.id,
+          style: params.style || "realistic",
+        }),
       });
 
       const statusData = await statusResult.json();

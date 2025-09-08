@@ -8,6 +8,7 @@ import {
   BASE_PROMPT,
   BASE_NEGATIVE_PROMPT,
 } from "@/utils/defaultSetting";
+import { ImageStyle } from "@/types/api";
 import { useImageViewer } from "react-image-viewer-hook";
 import { styled } from "@mui/material/styles";
 import {
@@ -26,6 +27,8 @@ import {
   CardContent,
   IconButton,
   Stack,
+  ToggleButton,
+  ToggleButtonGroup,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import SwapVertIcon from "@mui/icons-material/SwapVert";
@@ -47,6 +50,7 @@ const initialParams = {
   num_inference_steps: defaultParams.num_inference_steps,
   guidance_scale: defaultParams.guidance_scale,
   scheduler: defaultParams.scheduler,
+  style: "realistic" as ImageStyle,
 };
 
 export default function GeneratePage() {
@@ -59,6 +63,7 @@ export default function GeneratePage() {
       prompt: string;
       negative_prompt: string;
       imageUrl: string;
+      style?: ImageStyle;
       id?: string;
     }>
   >([]);
@@ -78,6 +83,7 @@ export default function GeneratePage() {
       prompt: string;
       negative_prompt: string;
       imageUrl: string;
+      style?: ImageStyle;
       id?: string;
     }>
   ) => {
@@ -124,6 +130,7 @@ export default function GeneratePage() {
       prompt: params.prompt,
       negative_prompt: params.negative_prompt,
       imageUrl: processedUrl,
+      style: params.style,
       id: Date.now().toString(),
     };
     updateHistory([newItem, ...promptHistory]);
@@ -149,11 +156,13 @@ export default function GeneratePage() {
     prompt: string;
     negative_prompt: string;
     imageUrl: string;
+    style?: ImageStyle;
   }) => {
     setParams((prev) => ({
       ...prev,
       prompt: item.prompt,
       negative_prompt: item.negative_prompt,
+      style: item.style || "realistic",
     }));
     setImageUrl(item.imageUrl);
     setHistoryOpen(false);
@@ -267,6 +276,27 @@ export default function GeneratePage() {
               <Button variant="outlined" onClick={() => setHistoryOpen(true)}>
                 hist
               </Button>
+            </Box>
+
+            {/* Style Selector */}
+            <Box sx={{ display: "flex", justifyContent: "center", mb: 3 }}>
+              <ToggleButtonGroup
+                value={params.style}
+                exclusive
+                onChange={(_, newStyle) => {
+                  if (newStyle !== null) {
+                    setParams({ ...params, style: newStyle as ImageStyle });
+                  }
+                }}
+                aria-label="image style"
+              >
+                <ToggleButton value="realistic" aria-label="realistic style">
+                  Realistic
+                </ToggleButton>
+                <ToggleButton value="anime" aria-label="anime style">
+                  Anime
+                </ToggleButton>
+              </ToggleButtonGroup>
             </Box>
             <Box component="form" onSubmit={handleSubmit} noValidate>
               <Grid container spacing={{ xs: 2, md: 3 }}>
@@ -515,6 +545,26 @@ export default function GeneratePage() {
                         sx={{ objectFit: "cover" }}
                         onClick={getOnClick(item.imageUrl)}
                       />
+                      <Box
+                        sx={{
+                          position: "absolute",
+                          left: 4,
+                          top: 4,
+                          px: 1,
+                          py: 0.25,
+                          borderRadius: 0.5,
+                          bgcolor:
+                            item.style === "anime"
+                              ? "secondary.main"
+                              : "primary.main",
+                          color: "white",
+                          fontSize: "0.625rem",
+                          fontWeight: "bold",
+                          textTransform: "uppercase",
+                        }}
+                      >
+                        {item.style || "realistic"}
+                      </Box>
                       <IconButton
                         size="small"
                         sx={{
@@ -573,6 +623,33 @@ export default function GeneratePage() {
                     <DeleteIcon fontSize="small" />
                   </IconButton>
                   <CardContent>
+                    <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
+                      <Typography
+                        variant="subtitle2"
+                        color="text.secondary"
+                        sx={{ flexGrow: 1 }}
+                      >
+                        Style:
+                      </Typography>
+                      <Typography
+                        variant="caption"
+                        sx={{
+                          px: 1,
+                          py: 0.5,
+                          borderRadius: 1,
+                          bgcolor:
+                            item.style === "anime"
+                              ? "secondary.light"
+                              : "primary.light",
+                          color:
+                            item.style === "anime"
+                              ? "secondary.contrastText"
+                              : "primary.contrastText",
+                        }}
+                      >
+                        {item.style || "realistic"}
+                      </Typography>
+                    </Box>
                     <Typography
                       variant="subtitle2"
                       color="text.secondary"

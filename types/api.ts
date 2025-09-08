@@ -46,3 +46,18 @@ export interface RunPodInput {
   seed: number;
   scheduler: string;
 }
+
+export type ImageStyle = "realistic" | "anime";
+
+export interface ImageGenerationParams {
+  prompt: string;
+  negative_prompt?: string;
+  height?: number;
+  width?: number;
+  num_inference_steps?: number;
+  guidance_scale?: number;
+  num_images?: number;
+  seed?: number;
+  scheduler?: string;
+  style?: ImageStyle;
+}
