@@ -12,9 +12,24 @@ export const defaultParams = {
   scheduler: SchedulerType.DPMSolverSDEKarras,
 };
 
+export const defaultParamsAnime = {
+  prompt: "masterpiece, high detail, best quality, 8k, ",
+  negative_prompt:
+    "bad quality,worst quality,worst detail,sketch,text,words,3d,",
+  height: 1440,
+  width: 1024,
+  num_inference_steps: 20,
+  guidance_scale: 5,
+  scheduler: SchedulerType.EULER_A,
+};
+
 // Base prompts for character image generation
 export const BASE_PROMPT = defaultParams.prompt;
 export const BASE_NEGATIVE_PROMPT = defaultParams.negative_prompt;
+
+// Anime base prompts
+export const BASE_PROMPT_ANIME = defaultParamsAnime.prompt;
+export const BASE_NEGATIVE_PROMPT_ANIME = defaultParamsAnime.negative_prompt;
 
 // Default generation parameters
 export const DEFAULT_GENERATION_PARAMS = {

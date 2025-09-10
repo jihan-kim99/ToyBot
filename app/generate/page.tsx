@@ -5,8 +5,11 @@ import { generateImage } from "@/utils/generateImage";
 import { SchedulerType, getSchedulerTypes } from "@/utils/schedulerTypes";
 import {
   defaultParams,
+  defaultParamsAnime,
   BASE_PROMPT,
   BASE_NEGATIVE_PROMPT,
+  BASE_PROMPT_ANIME,
+  BASE_NEGATIVE_PROMPT_ANIME,
 } from "@/utils/defaultSetting";
 import { ImageStyle } from "@/types/api";
 import { useImageViewer } from "react-image-viewer-hook";
@@ -252,12 +255,18 @@ export default function GeneratePage() {
   };
 
   const handleAddBasePrompt = () => {
+    const isAnime = params.style === "anime";
+    const basePrompt = isAnime ? BASE_PROMPT_ANIME : BASE_PROMPT;
+    const baseNegPrompt = isAnime
+      ? BASE_NEGATIVE_PROMPT_ANIME
+      : BASE_NEGATIVE_PROMPT;
+
     setParams((prev) => ({
       ...prev,
-      prompt: prev.prompt ? `${BASE_PROMPT}, ${prev.prompt}` : BASE_PROMPT,
+      prompt: prev.prompt ? `${basePrompt}, ${prev.prompt}` : basePrompt,
       negative_prompt: prev.negative_prompt
-        ? `${BASE_NEGATIVE_PROMPT}, ${prev.negative_prompt}`
-        : BASE_NEGATIVE_PROMPT,
+        ? `${baseNegPrompt}, ${prev.negative_prompt}`
+        : baseNegPrompt,
     }));
   };
 
@@ -285,7 +294,20 @@ export default function GeneratePage() {
                 exclusive
                 onChange={(_, newStyle) => {
                   if (newStyle !== null) {
-                    setParams({ ...params, style: newStyle as ImageStyle });
+                    const style = newStyle as ImageStyle;
+                    const newDefaults =
+                      style === "anime" ? defaultParamsAnime : defaultParams;
+                    setParams({
+                      ...params,
+                      style,
+                      prompt: newDefaults.prompt,
+                      negative_prompt: newDefaults.negative_prompt,
+                      height: newDefaults.height,
+                      width: newDefaults.width,
+                      num_inference_steps: newDefaults.num_inference_steps,
+                      guidance_scale: newDefaults.guidance_scale,
+                      scheduler: newDefaults.scheduler,
+                    });
                   }
                 }}
                 aria-label="image style"

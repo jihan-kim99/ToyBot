@@ -7,6 +7,7 @@ import {
   Button,
   TextField,
 } from "@mui/material";
+import { BASE_PROMPT_ANIME } from "@/utils/defaultSetting";
 
 interface PromptDialogProps {
   isOpen: boolean;
@@ -25,12 +26,10 @@ const PromptDialog: React.FC<PromptDialogProps> = ({
   onGenerate,
   isGenerating,
 }) => {
-  // Base prompt constants
-  const BASE_PROMPT =
-    "(detailed skin texture), 4k, highly detailed, masterpiece";
-
   const handleAddBasePrompt = () => {
-    const newPrompt = prompt ? `${BASE_PROMPT}, ${prompt}` : BASE_PROMPT;
+    const newPrompt = prompt
+      ? `${BASE_PROMPT_ANIME}, ${prompt}`
+      : BASE_PROMPT_ANIME;
     onPromptChange(newPrompt);
   };
 

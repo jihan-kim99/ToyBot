@@ -38,7 +38,10 @@ import { whatsappTheme } from "@/theme/whatsapp";
 import { CardCarousel } from "../molecules/CardCarousel";
 import { ChatHistory, getCharacterChatHistories } from "@/utils/indexedDB";
 import { ChatHistorySlider } from "../molecules/ChatHistorySlider";
-import { BASE_PROMPT, BASE_NEGATIVE_PROMPT } from "@/utils/defaultSetting";
+import {
+  BASE_PROMPT_ANIME,
+  BASE_NEGATIVE_PROMPT_ANIME,
+} from "@/utils/defaultSetting";
 
 interface CharacterSettingProps {
   charaImage: string;
@@ -78,11 +81,14 @@ export const CharacterSetting = ({
   const [chatHistories, setChatHistories] = useState<ChatHistory[]>([]);
 
   const handleAddBasePrompt = () => {
+    // Use anime base prompts for character generation
     setCharaImagePrompt((prev) =>
-      prev ? `${BASE_PROMPT}, ${prev}` : BASE_PROMPT
+      prev ? `${BASE_PROMPT_ANIME}, ${prev}` : BASE_PROMPT_ANIME
     );
     setCharaImageNegPrompt((prev) =>
-      prev ? `${BASE_NEGATIVE_PROMPT}, ${prev}` : BASE_NEGATIVE_PROMPT
+      prev
+        ? `${BASE_NEGATIVE_PROMPT_ANIME}, ${prev}`
+        : BASE_NEGATIVE_PROMPT_ANIME
     );
   };
 

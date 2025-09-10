@@ -5,7 +5,12 @@ import {
   HarmCategory,
 } from "@google/generative-ai";
 import { Message } from "@/types/chat";
-import { BASE_PROMPT, BASE_NEGATIVE_PROMPT } from "@/utils/defaultSetting";
+import {
+  BASE_PROMPT,
+  BASE_NEGATIVE_PROMPT,
+  BASE_PROMPT_ANIME,
+  BASE_NEGATIVE_PROMPT_ANIME,
+} from "@/utils/defaultSetting";
 
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY || "");
 
@@ -85,7 +90,7 @@ async function processMessages(
 export async function POST(req: Request) {
   try {
     const requestData = await req.json();
-    const { messages, systemPrompt, charaAppearance } = requestData;
+    const { messages, systemPrompt, charaAppearance, style } = requestData;
 
     if (!messages) {
       throw new Error("Messages are required for prompt generation");
@@ -97,10 +102,10 @@ export async function POST(req: Request) {
       charaAppearance
     );
 
-    // const ponyBasePrompt = "score_7_up, score_8_up, score_9,";
-    const ilBasePrompt = BASE_PROMPT;
-    // const ponyNeg = "score_6, score_5, score_4, jpeg artifacts, compression artifacts, blurry, noise, scanlines, distortion, chromatic aberration, vignette, extra fingers, extra limbs, missing fingers, missing limbs, bad anatomy, extra toes, deformed fingers, deformed legs, bad foots, melting fingers, melting toes, long body, asymmetric composition, rough edges, pixelation, glitch, error, watermarks, signatures, text, UI elements, overlays, camera frame, borders, low quality, distortion, blurry background, artifacts, random text, low detail, misspelled text, excessive noise";
-    const ilNeg = BASE_NEGATIVE_PROMPT;
+    // Select base prompt based on style
+    const isAnime = style === "anime";
+    const ilBasePrompt = isAnime ? BASE_PROMPT_ANIME : BASE_PROMPT;
+    const ilNeg = isAnime ? BASE_NEGATIVE_PROMPT_ANIME : BASE_NEGATIVE_PROMPT;
 
     const fullPrompt = `${ilBasePrompt}, ${promptContext}`;
     const negative_prompt = ilNeg;

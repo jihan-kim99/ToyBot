@@ -5,7 +5,10 @@ import { ChatTemplate } from "@/components/templates/ChatTemplate";
 import { CharacterSetting } from "@/components/templates/CharacterSetting";
 import PromptDialog from "@/components/molecules/PromptDialog";
 import { generateImage } from "@/utils/generateImage";
-import { BASE_PROMPT, BASE_NEGATIVE_PROMPT } from "@/utils/defaultSetting";
+import {
+  BASE_PROMPT_ANIME,
+  BASE_NEGATIVE_PROMPT_ANIME,
+} from "@/utils/defaultSetting";
 import {
   initDB,
   saveChatHistory,
@@ -184,6 +187,7 @@ export default function ChatInterface() {
           messages: shrunkMessages,
           systemPrompt: JSON.stringify(systemPrompt),
           charaAppearance: charaAppearance,
+          style: "anime", // Default to anime for character interactions
         }),
       });
 
@@ -193,14 +197,14 @@ export default function ChatInterface() {
         setImageNeg(data.negative_prompt);
       } else {
         console.error("Error generating prompt:", data.error);
-        setImagePrompt(BASE_PROMPT);
-        setImageNeg(BASE_NEGATIVE_PROMPT);
+        setImagePrompt(BASE_PROMPT_ANIME);
+        setImageNeg(BASE_NEGATIVE_PROMPT_ANIME);
       }
     } catch (error) {
       console.error("Error generating prompt:", error);
-      // Set fallback prompt when request fails
-      setImagePrompt(BASE_PROMPT);
-      setImageNeg(BASE_NEGATIVE_PROMPT);
+      // Set fallback prompt when request fails (use anime for character interactions)
+      setImagePrompt(BASE_PROMPT_ANIME);
+      setImageNeg(BASE_NEGATIVE_PROMPT_ANIME);
     } finally {
       // Always show the dialog regardless of success or failure
       setIsPromptDialogOpen(true);
