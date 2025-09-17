@@ -13,13 +13,14 @@ export const defaultParams = {
 };
 
 export const defaultParamsAnime = {
-  prompt: "masterpiece, high detail, best quality, 8k",
+  prompt:
+    "highres, hi res, best quality, masterpiece, anime coloring, anime screencap, shiny skin, TRexStyle",
   negative_prompt:
     "bad quality, worst quality, worst detail, sketch, text, words, 3d",
   height: 1440,
   width: 1024,
-  num_inference_steps: 20,
-  guidance_scale: 5,
+  num_inference_steps: 23,
+  guidance_scale: 7,
   scheduler: SchedulerType.EULER_A,
 };
 
