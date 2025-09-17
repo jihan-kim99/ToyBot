@@ -67,6 +67,11 @@ export default function GeneratePage() {
       negative_prompt: string;
       imageUrl: string;
       style?: ImageStyle;
+      width: number;
+      height: number;
+      num_inference_steps: number;
+      guidance_scale: number;
+      scheduler: SchedulerType;
       id?: string;
     }>
   >([]);
@@ -87,6 +92,11 @@ export default function GeneratePage() {
       negative_prompt: string;
       imageUrl: string;
       style?: ImageStyle;
+      width: number;
+      height: number;
+      num_inference_steps: number;
+      guidance_scale: number;
+      scheduler: SchedulerType;
       id?: string;
     }>
   ) => {
@@ -134,6 +144,11 @@ export default function GeneratePage() {
       negative_prompt: params.negative_prompt,
       imageUrl: processedUrl,
       style: params.style,
+      width: params.width,
+      height: params.height,
+      num_inference_steps: params.num_inference_steps,
+      guidance_scale: params.guidance_scale,
+      scheduler: params.scheduler,
       id: Date.now().toString(),
     };
     updateHistory([newItem, ...promptHistory]);
@@ -160,12 +175,22 @@ export default function GeneratePage() {
     negative_prompt: string;
     imageUrl: string;
     style?: ImageStyle;
+    width: number;
+    height: number;
+    num_inference_steps: number;
+    guidance_scale: number;
+    scheduler: SchedulerType;
   }) => {
     setParams((prev) => ({
       ...prev,
       prompt: item.prompt,
       negative_prompt: item.negative_prompt,
       style: item.style || "realistic",
+      width: item.width,
+      height: item.height,
+      num_inference_steps: item.num_inference_steps,
+      guidance_scale: item.guidance_scale,
+      scheduler: item.scheduler,
     }));
     setImageUrl(item.imageUrl);
     setHistoryOpen(false);
@@ -300,7 +325,6 @@ export default function GeneratePage() {
                     setParams({
                       ...params,
                       style,
-                      prompt: newDefaults.prompt,
                       negative_prompt: newDefaults.negative_prompt,
                       height: newDefaults.height,
                       width: newDefaults.width,
@@ -565,7 +589,7 @@ export default function GeneratePage() {
                         image={item.imageUrl}
                         alt={item.prompt}
                         sx={{ objectFit: "cover" }}
-                        onClick={getOnClick(item.imageUrl)}
+                        onClick={() => handleHistorySelect(item)}
                       />
                       <Box
                         sx={{

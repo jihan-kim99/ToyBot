@@ -2,9 +2,9 @@ import { SchedulerType } from "./schedulerTypes";
 
 export const defaultParams = {
   prompt:
-    "masterpiece, ultra-HD, photorealistic, high detail, best quality, 8k, best quality, sharp focus, realistic, depth of field, realistic skin texture",
+    "masterpiece, ultra-HD, photorealistic, high detail, best quality, 8k, sharp focus, realistic, depth of field, realistic skin texture",
   negative_prompt:
-    "bad quality,worst quality,worst detail,sketch,text,words,3d,",
+    "bad quality, worst quality, worst detail, sketch, text, words, 3d",
   height: 1352,
   width: 1080,
   num_inference_steps: 27,
@@ -13,9 +13,9 @@ export const defaultParams = {
 };
 
 export const defaultParamsAnime = {
-  prompt: "masterpiece, high detail, best quality, 8k, ",
+  prompt: "masterpiece, high detail, best quality, 8k",
   negative_prompt:
-    "bad quality,worst quality,worst detail,sketch,text,words,3d,",
+    "bad quality, worst quality, worst detail, sketch, text, words, 3d",
   height: 1440,
   width: 1024,
   num_inference_steps: 20,
