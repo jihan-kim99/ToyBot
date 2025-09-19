@@ -1,5 +1,5 @@
 import { SchedulerType } from "./schedulerTypes";
-import { defaultParams } from "./defaultSetting";
+import { defaultParams, defaultParamsAnime } from "./defaultSetting";
 import { ImageStyle } from "@/types/api";
 
 interface GenerationParams {
@@ -17,14 +17,18 @@ interface GenerationParams {
 
 export const generateImage = async (params: GenerationParams) => {
   try {
+    // Get style-specific defaults
+    const styleDefaults =
+      params.style === "anime" ? defaultParamsAnime : defaultParams;
+
     const roundUpHeight =
       8 -
-      ((params.height || defaultParams.height) % 8) +
-      (params.height || defaultParams.height);
+      ((params.height || styleDefaults.height) % 8) +
+      (params.height || styleDefaults.height);
     const roundUpWidth =
       8 -
-      ((params.width || defaultParams.width) % 8) +
-      (params.width || defaultParams.width);
+      ((params.width || styleDefaults.width) % 8) +
+      (params.width || styleDefaults.width);
     // Initial generation request
     const result = await fetch("/api/imgGen", {
       method: "POST",
@@ -36,11 +40,11 @@ export const generateImage = async (params: GenerationParams) => {
         height: roundUpHeight,
         width: roundUpWidth,
         num_inference_steps:
-          params.num_inference_steps || defaultParams.num_inference_steps,
-        guidance_scale: params.guidance_scale || defaultParams.guidance_scale,
+          params.num_inference_steps || styleDefaults.num_inference_steps,
+        guidance_scale: params.guidance_scale || styleDefaults.guidance_scale,
         num_images: params.num_images || 1,
         seed: params.seed || Math.floor(Math.random() * 2147483647),
-        scheduler: params.scheduler || defaultParams.scheduler,
+        scheduler: params.scheduler || styleDefaults.scheduler,
         style: params.style || "realistic",
       }),
     });

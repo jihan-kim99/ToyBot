@@ -6,8 +6,12 @@ import {
   DialogActions,
   Button,
   TextField,
+  Box,
+  ToggleButton,
+  ToggleButtonGroup,
 } from "@mui/material";
 import { BASE_PROMPT_ANIME } from "@/utils/defaultSetting";
+import { ImageStyle } from "@/types/api";
 
 interface PromptDialogProps {
   isOpen: boolean;
@@ -16,6 +20,8 @@ interface PromptDialogProps {
   onPromptChange: (prompt: string) => void;
   onGenerate: () => void;
   isGenerating: boolean;
+  style: ImageStyle;
+  onStyleChange: (style: ImageStyle) => void;
 }
 
 const PromptDialog: React.FC<PromptDialogProps> = ({
@@ -25,6 +31,8 @@ const PromptDialog: React.FC<PromptDialogProps> = ({
   onPromptChange,
   onGenerate,
   isGenerating,
+  style,
+  onStyleChange,
 }) => {
   const handleAddBasePrompt = () => {
     const newPrompt = prompt
@@ -43,6 +51,27 @@ const PromptDialog: React.FC<PromptDialogProps> = ({
       <DialogTitle>Edit Image Generation Prompt</DialogTitle>
 
       <DialogContent>
+        {/* Style selector */}
+        <Box sx={{ display: "flex", justifyContent: "center", mb: 2 }}>
+          <ToggleButtonGroup
+            value={style}
+            exclusive
+            onChange={(_, newStyle) => {
+              if (newStyle !== null) {
+                onStyleChange(newStyle as ImageStyle);
+              }
+            }}
+            aria-label="image style"
+          >
+            <ToggleButton value="realistic" aria-label="realistic style">
+              Realistic
+            </ToggleButton>
+            <ToggleButton value="anime" aria-label="anime style">
+              Anime
+            </ToggleButton>
+          </ToggleButtonGroup>
+        </Box>
+
         <TextField
           fullWidth
           multiline

@@ -18,6 +18,7 @@ import {
 
 import { Message } from "@/types/chat";
 import type { CharacterData } from "@/types/character";
+import { ImageStyle } from "@/types/api";
 
 // Create debounced function outside component
 const createDebouncedSave = () =>
@@ -58,6 +59,7 @@ export default function ChatInterface() {
   const [imagePrompt, setImagePrompt] = useState("");
   const [imageNeg, setImageNeg] = useState("");
   const [isGeneratingImage, setIsGeneratingImage] = useState(false);
+  const [imageStyle, setImageStyle] = useState<ImageStyle>("anime");
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -116,8 +118,9 @@ export default function ChatInterface() {
       });
     }
 
+    const currentDebouncedSave = debouncedSave.current;
     return () => {
-      debouncedSave.current.cancel();
+      currentDebouncedSave.cancel();
     };
   }, [messages, chatId, systemPrompt.name]);
 
@@ -187,7 +190,7 @@ export default function ChatInterface() {
           messages: shrunkMessages,
           systemPrompt: JSON.stringify(systemPrompt),
           charaAppearance: charaAppearance,
-          style: "anime", // Default to anime for character interactions
+          style: imageStyle,
         }),
       });
 
@@ -218,6 +221,7 @@ export default function ChatInterface() {
       const imageUrl = await generateImage({
         prompt: imagePrompt,
         negative_prompt: imageNeg,
+        style: imageStyle,
       });
 
       if (imageUrl) {
@@ -297,6 +301,8 @@ export default function ChatInterface() {
             onPromptChange={setImagePrompt}
             onGenerate={handleGenerateImage}
             isGenerating={isGeneratingImage}
+            style={imageStyle}
+            onStyleChange={setImageStyle}
           />
         </>
       )}
