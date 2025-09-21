@@ -361,10 +361,23 @@ export default function GeneratePage() {
                 </Grid>
                 <Grid
                   size={12}
-                  sx={{ display: "flex", justifyContent: "center" }}
+                  sx={{ display: "flex", justifyContent: "center", gap: 2 }}
                 >
                   <Button variant="outlined" onClick={handleAddBasePrompt}>
                     Base
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    color="error"
+                    onClick={() =>
+                      setParams((prev) => ({
+                        ...prev,
+                        prompt: "",
+                        negative_prompt: "",
+                      }))
+                    }
+                  >
+                    Clear
                   </Button>
                 </Grid>
                 <Grid size={12}>
