@@ -18,7 +18,7 @@ export async function POST(request: Request) {
   try {
     const { message, history, systemPrompt } = await request.json();
     const model = genAI.getGenerativeModel({
-      model: "gemini-2.5-flash-preview-05-20",
+      model: "gemini-2.5-flash",
       safetySettings: [
         {
           category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
@@ -181,7 +181,7 @@ export async function POST(request: Request) {
     });
 
     const result = await chat.sendMessage(message);
-    console.log(JSON.stringify(result, null, 2));
+    // console.log(JSON.stringify(result, null, 2));
 
     const response = result.response;
 

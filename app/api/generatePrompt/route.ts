@@ -60,7 +60,7 @@ async function processMessages(
   const stateResponse = await stateResult.response;
   const extractedStates = stateResponse.text().trim();
 
-  console.log(extractedStates);
+  // console.log(extractedStates);
 
   const prompt = `
   Given this 
@@ -109,7 +109,7 @@ export async function POST(req: Request) {
 
     const fullPrompt = `${ilBasePrompt}, ${promptContext}`;
     const negative_prompt = ilNeg;
-    console.log("Generated prompt:", fullPrompt);
+    // console.log("Generated prompt:", fullPrompt);
 
     return NextResponse.json({
       success: true,
