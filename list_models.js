@@ -1,13 +1,13 @@
-const fs = require('fs');
-const path = require('path');
+const fs = require("fs");
+const path = require("path");
 
 // Load env vars from .env.local
 try {
-  const envPath = path.resolve(process.cwd(), '.env.local');
+  const envPath = path.resolve(process.cwd(), ".env.local");
   if (fs.existsSync(envPath)) {
-    const envConfig = fs.readFileSync(envPath, 'utf8');
-    envConfig.split('\n').forEach(line => {
-      const [key, value] = line.split('=');
+    const envConfig = fs.readFileSync(envPath, "utf8");
+    envConfig.split("\n").forEach((line) => {
+      const [key, value] = line.split("=");
       if (key && value) {
         process.env[key.trim()] = value.trim();
       }
@@ -30,7 +30,7 @@ async function listModels() {
     const data = await response.json();
     if (data.models) {
       console.log("Available Models:");
-      data.models.forEach(model => {
+      data.models.forEach((model) => {
         console.log(`- ${model.name}`);
       });
     } else {
