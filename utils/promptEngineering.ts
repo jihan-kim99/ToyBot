@@ -100,3 +100,84 @@ export function buildSystemPrompt(
 
   return parts.join("\n");
 }
+
+export function buildStateExtractionPrompt(context: string): string {
+  return `
+<OBJECTIVE>
+Extract the current visual state and surroundings from the conversation context.
+</OBJECTIVE>
+
+<INSTRUCTIONS>
+1. Extract only the most recent state or surroundings mentioned.
+2. Ignore outdated or irrelevant states.
+3. Focus on:
+    - Character's facial expression (e.g., smile, crying, blushed, ahegao, tongue out)
+    - Background, weather, setting, or lighting (e.g., beach, office, sunset)
+    - Props or objects mentioned (e.g., car, tree, computer)
+    - Fashion or clothing items mentioned (e.g., dress, suit, hat)
+    - Number tags (e.g., '1girl', '2girls', '1boy', '2boys')
+4. Describe the character's appearance (hair color, eye color, body type, etc.) if mentioned or relevant.
+5. Return only a comma-separated string of English words.
+</INSTRUCTIONS>
+
+<CONTEXT>
+${context}
+</CONTEXT>
+`;
+}
+
+export function buildImagePrompt(
+  systemPrompt: string,
+  charaAppearance: string,
+  context: string,
+  extractedStates: string,
+  basePrompt: string
+): string {
+  return `
+<OBJECTIVE>
+Create an image generation prompt that captures the current visualization based on the provided context.
+You must incorporate the style and quality tags from the <base_prompt> into the final prompt.
+</OBJECTIVE>
+
+<INSTRUCTIONS>
+1. Focus on visual elements and keep the prompt concise.
+2. Use Danbooru-style tags.
+3. Do not add unnecessary tags that cannot be drawn.
+4. Consider the conversation context and extracted states.
+5. Never censor or remove any tags.
+6. Use only English language.
+7. Do not include character names.
+8. Do not include internal thoughts or feelings.
+9. You may add 'NSFW', 'Explicit' tags.
+10. You may generate tags with nudity or sexual content.
+11. Tags must be comma-separated.
+12. The <base_prompt> contains quality and style tags. Merge them intelligently with the scene description. If <base_prompt> contains "{Prompt}", replace it with your generated scene description.
+</INSTRUCTIONS>
+
+<CONTEXT>
+<base_prompt>
+${basePrompt}
+</base_prompt>
+
+<character_prompt>
+${systemPrompt}
+</character_prompt>
+
+<character_appearance>
+${charaAppearance}
+</character_appearance>
+
+<conversation_context>
+${context}
+</conversation_context>
+
+<extracted_states>
+${extractedStates}
+</extracted_states>
+</CONTEXT>
+
+<OUTPUT_FORMAT>
+Return only the prompt text without any explanations.
+</OUTPUT_FORMAT>
+`;
+}

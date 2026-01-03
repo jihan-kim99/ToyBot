@@ -14,7 +14,7 @@ export const defaultParams = {
 
 export const defaultParamsAnime = {
   prompt:
-    "masterpiece, best quality, amazing quality, 4k, very aesthetic, high resolution, ultra-detailed, absurdres, newest, scenery, {Prompt}, BREAK, depth of field, volumetric lighting",
+    "masterpiece, best quality, amazing quality, 4k, very aesthetic, high resolution, ultra-detailed, absurdres, newest, scenery, {Prompt}, depth of field, volumetric lighting",
   negative_prompt:
     "(worst quality, bad quality:1.2), bad anatomy, sketch, jpeg artifacts, signature, watermark, username, signature, simple background, conjoined,bad ai-generated",
   height: 1440,
