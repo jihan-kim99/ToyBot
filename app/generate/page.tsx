@@ -56,10 +56,17 @@ const initialParams = {
   style: "realistic" as ImageStyle,
 };
 
+interface QueueItem {
+  id: string;
+  status: "loading" | "completed" | "failed";
+  imageUrl?: string;
+  params: typeof initialParams;
+}
+
 export default function GeneratePage() {
   const [params, setParams] = useState(initialParams);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [queue, setQueue] = useState<QueueItem[]>([]);
   const [historyOpen, setHistoryOpen] = useState(false);
   const [promptHistory, setPromptHistory] = useState<
     Array<{
@@ -129,30 +136,77 @@ export default function GeneratePage() {
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const generateImageTask = async (
+    id: string,
+    currentParams: typeof initialParams
+  ) => {
+    try {
+      const url = await generateImage(currentParams);
+      if (!url) throw new Error("Generation failed");
+
+      // Process image before saving to history
+      const processedUrl = await processImageForStorage(url);
+
+      // Update Queue Item
+      setQueue((prev) =>
+        prev.map((item) =>
+          item.id === id
+            ? { ...item, status: "completed", imageUrl: processedUrl }
+            : item
+        )
+      );
+
+      // Update Main View
+      setImageUrl(processedUrl);
+
+      // Add to History
+      const newItem = {
+        prompt: currentParams.prompt,
+        negative_prompt: currentParams.negative_prompt,
+        imageUrl: processedUrl,
+        style: currentParams.style,
+        width: currentParams.width,
+        height: currentParams.height,
+        num_inference_steps: currentParams.num_inference_steps,
+        guidance_scale: currentParams.guidance_scale,
+        scheduler: currentParams.scheduler,
+        id: id,
+      };
+
+      setPromptHistory((prev) => {
+        const newHistory = [newItem, ...prev];
+        localStorage.setItem("promptHistory", JSON.stringify(newHistory));
+        return newHistory;
+      });
+    } catch (error) {
+      console.error("Error generating image:", error);
+      setQueue((prev) =>
+        prev.map((item) =>
+          item.id === id ? { ...item, status: "failed" } : item
+        )
+      );
+    }
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
-    const url = await generateImage(params);
-    setImageUrl(url);
 
-    // Process image before saving to history
-    const processedUrl = await processImageForStorage(url);
+    const activeCount = queue.filter((i) => i.status === "loading").length;
+    if (activeCount >= 5) return;
 
-    // Add current prompts and processed image to history with unique id
-    const newItem = {
-      prompt: params.prompt,
-      negative_prompt: params.negative_prompt,
-      imageUrl: processedUrl,
-      style: params.style,
-      width: params.width,
-      height: params.height,
-      num_inference_steps: params.num_inference_steps,
-      guidance_scale: params.guidance_scale,
-      scheduler: params.scheduler,
-      id: Date.now().toString(),
+    const id = Date.now().toString();
+    const newQueueItem: QueueItem = {
+      id,
+      status: "loading",
+      params: { ...params },
     };
-    updateHistory([newItem, ...promptHistory]);
-    setLoading(false);
+
+    setQueue((prev) => {
+      const newQueue = [newQueueItem, ...prev];
+      return newQueue.slice(0, 5);
+    });
+
+    generateImageTask(id, params);
   };
 
   const handleKeyPress = (e: KeyboardEvent) => {
@@ -487,11 +541,21 @@ export default function GeneratePage() {
                     fullWidth
                     type="submit"
                     variant="contained"
-                    disabled={loading}
+                    disabled={
+                      queue.filter((i) => i.status === "loading").length >= 5
+                    }
                     sx={{ height: 56 }}
                   >
-                    {loading ? (
-                      <CircularProgress size={24} color="inherit" />
+                    {queue.some((i) => i.status === "loading") ? (
+                      <>
+                        <CircularProgress
+                          size={24}
+                          color="inherit"
+                          sx={{ mr: 1 }}
+                        />
+                        Generating (
+                        {queue.filter((i) => i.status === "loading").length}/5)
+                      </>
                     ) : (
                       "Generate"
                     )}
@@ -507,14 +571,25 @@ export default function GeneratePage() {
             elevation={3}
             sx={{
               display: "flex",
+              flexDirection: "column",
               alignItems: "center",
               justifyContent: "center",
               bgcolor: imageUrl ? "background.paper" : "grey.100",
               minHeight: { xs: "300px", md: "600px" },
+              p: 2,
             }}
           >
             {imageUrl ? (
-              <>
+              <Box
+                sx={{
+                  flexGrow: 1,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  width: "100%",
+                  overflow: "hidden",
+                }}
+              >
                 <Box
                   component="img"
                   src={imageUrl}
@@ -523,18 +598,88 @@ export default function GeneratePage() {
                   sx={{
                     width: "100%",
                     height: "auto",
-                    maxWidth: "100%",
-                    display: "block",
+                    maxHeight: "100%",
+                    objectFit: "contain",
                     cursor: "pointer",
                     borderRadius: 1,
                   }}
                 />
                 <ImageViewer />
-              </>
+              </Box>
             ) : (
-              <Typography variant="h6" color="text.secondary">
-                Generated image will appear here
-              </Typography>
+              <Box
+                sx={{
+                  flexGrow: 1,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <Typography variant="h6" color="text.secondary">
+                  Generated image will appear here
+                </Typography>
+              </Box>
+            )}
+
+            {/* Queue Strip */}
+            {queue.length > 0 && (
+              <Stack
+                direction="row"
+                spacing={1}
+                sx={{
+                  mt: 2,
+                  width: "100%",
+                  overflowX: "auto",
+                  justifyContent: "center",
+                  py: 1,
+                }}
+              >
+                {queue.map((item) => (
+                  <Box
+                    key={item.id}
+                    onClick={() => item.imageUrl && setImageUrl(item.imageUrl)}
+                    sx={{
+                      width: 80,
+                      height: 80,
+                      borderRadius: 1,
+                      overflow: "hidden",
+                      cursor: item.imageUrl ? "pointer" : "default",
+                      border:
+                        imageUrl === item.imageUrl
+                          ? "2px solid"
+                          : "1px solid",
+                      borderColor:
+                        imageUrl === item.imageUrl
+                          ? "primary.main"
+                          : "grey.300",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      position: "relative",
+                      flexShrink: 0,
+                      bgcolor: "background.paper",
+                    }}
+                  >
+                    {item.status === "loading" ? (
+                      <CircularProgress size={24} />
+                    ) : item.status === "failed" ? (
+                      <Typography variant="caption" color="error">
+                        Failed
+                      </Typography>
+                    ) : (
+                      <Box
+                        component="img"
+                        src={item.imageUrl}
+                        sx={{
+                          width: "100%",
+                          height: "100%",
+                          objectFit: "cover",
+                        }}
+                      />
+                    )}
+                  </Box>
+                ))}
+              </Stack>
             )}
           </Item>
         </Grid>
